@@ -1,3 +1,7 @@
+<% if false %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+<% else %>
 <%= simple_form_for @checkout do |f| %>    
   <% if false %>
     <%= render inline: ERB.new(@erb_code).result(binding) %>
@@ -17,4 +21,6 @@
   <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
   <%= f.button :submit, t('Save') %>
   <% end %>  
+<% end %>
+
 <% end %>

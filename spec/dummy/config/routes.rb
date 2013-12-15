@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   mount JobshopQuotex::Engine => '/quotex'
   mount MfgProcessx::Engine => '/processx'
   mount EventTaskx::Engine => '/event_taskx'
+  mount Searchx::Engine => '/searchx'
   
   resource :session
   

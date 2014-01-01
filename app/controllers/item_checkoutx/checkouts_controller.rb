@@ -28,6 +28,7 @@ module ItemCheckoutx
         if @checkout.save && @item.save && @item.stock_qty >= 0
           redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
         else
+          @item = ItemCheckoutx.item_class.find_by_id(params[:checkout][:item_id]) if params[:checkout].present? && params[:checkout][:item_id].present?
           flash[:notice] = t('Data Error. Not Saved!')
           render 'new'
         end

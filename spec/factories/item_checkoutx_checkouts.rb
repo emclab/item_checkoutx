@@ -9,8 +9,7 @@ FactoryGirl.define do
     requested_by_id 1
     out_date "2013-11-17"
     brief_note "My note Text"
-    state "My state String"
-    comment "My comment Text"
+    wf_state "My state String"
     wfid "MyString"
     requested_qty 1
     checkout_by_id 1

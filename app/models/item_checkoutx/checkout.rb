@@ -1,13 +1,13 @@
 module ItemCheckoutx
   class Checkout < ActiveRecord::Base
-    attr_accessor :name, :spec, :last_updated_by_name
-    attr_accessible :brief_note, :checkout_by_id, :comment, :item_id, :last_updated_by_id, :order_id, :out_date, :out_qty, :requested_by_id, :requested_qty, 
-                    :state, :wfid, 
+    attr_accessor :name, :spec, :last_updated_by_name, :id_noupdate, :wf_comment
+    attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :order_id, :out_date, :out_qty, :requested_by_id, :requested_qty, 
+                    :wf_state, :wfid, 
                     :name, :spec,
                     :as => :role_new
-    attr_accessible :brief_note, :checkout_by_id, :comment, :item_id, :last_updated_by_id, :order_id, :out_date, :out_qty, :requested_by_id, :requested_qty, 
-                    :state, :wfid,
-                    :name, :spec, :last_updated_by_name,
+    attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :order_id, :out_date, :out_qty, :requested_by_id, :requested_qty, 
+                    :wf_state, :wfid,
+                    :name, :spec, :last_updated_by_name, :id_noupdate, :wf_comment,
                     :as => :role_update
     belongs_to :last_updated_by, :class_name => 'Authentify::User'
     belongs_to :requested_by, :class_name => 'Authentify::User'

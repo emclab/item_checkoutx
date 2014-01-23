@@ -14,5 +14,7 @@ FactoryGirl.define do
     purchase_order_id 1
     in_date "2013-11-17"
     rejected false
+    warehouse_id 1
+    item_category_id 1
   end
 end

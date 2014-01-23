@@ -10,13 +10,13 @@ module ItemCheckoutx
       @checkouts = params[:item_checkoutx_checkouts][:model_ar_r]
       @checkouts = @checkouts.where(:item_id => @item.id) if @item
       @checkouts = @checkouts.page(params[:page]).per_page(@max_pagination)
-      @erb_code = find_config_const('checkout_index_view', 'item_checkoutx_checkouts')
+      @erb_code = find_config_const('checkout_index_view', 'item_checkoutx')
     end
   
     def new
       @title = t('New Warehouse Item')
       @checkout = ItemCheckoutx::Checkout.new()
-      @erb_code = find_config_const('checkout_new_view', 'item_checkoutx_checkouts')
+      @erb_code = find_config_const('checkout_new_view', 'item_checkoutx')
     end
   
     def create
@@ -38,7 +38,7 @@ module ItemCheckoutx
     def edit
       @title = t('Update Warehouse Item')
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
-      @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx_checkouts')
+      @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
     end
   
     def update

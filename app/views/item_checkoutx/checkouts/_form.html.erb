@@ -3,9 +3,6 @@
   
 <% else %>
 <%= simple_form_for @checkout do |f| %>    
-  <% if false %>
-    <%= render inline: ERB.new(@erb_code).result(binding) %>
-  <% else %>
   <%= f.input :item_id, :label => t("Item#"), :readonly => true, :input_html => {:value => @item.id} %> 
   <%= f.input :name, :label => t("Item Name"), :readonly => true, :input_html => {:value => @item.name} %>
   <%= f.input :spec, :label => t("Spec"), :readonly => true, :input_html => {:value => @item.spec} %>
@@ -19,7 +16,7 @@
   
   <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
   <%= f.button :submit, t('Save') %>  
-  <% end %>
+  
 <% end %>
 
 <% end %>

@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   mount Searchx::Engine => '/searchx'
   mount StateMachineLogx::Engine => '/sm_log'
   mount BizWorkflowx::Engine => '/wf'
+  mount PettyWarehousex::Engine => '/pw'
   
   resource :session
   

@@ -6,8 +6,7 @@ class CreatePurchaseOrderxOrders < ActiveRecord::Migration
       t.integer :quote_id
       t.integer :last_updated_by_id
       t.string :wfid
-      t.string :state
-      t.text :comment
+      t.string :wf_state
       t.integer :supplier_id
       t.integer :qty
       t.string :unit
@@ -32,5 +31,6 @@ class CreatePurchaseOrderxOrders < ActiveRecord::Migration
     add_index :purchase_orderx_orders, :supplier_id
     add_index :purchase_orderx_orders, :po_num
     add_index :purchase_orderx_orders, :requested_by_id
+    add_index :purchase_orderx_orders, :wf_state
   end
 end

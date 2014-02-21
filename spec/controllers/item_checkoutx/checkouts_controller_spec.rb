@@ -51,8 +51,6 @@ module ItemCheckoutx
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
         q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
         get 'index', {:use_route => :item_checkoutx, :item_id => @i1.id}
-        pp @i.id
-        pp @i1.id
         assigns(:checkouts).should =~ [q1]
       end
     end

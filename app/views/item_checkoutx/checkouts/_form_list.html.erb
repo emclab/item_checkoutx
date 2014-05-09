@@ -7,8 +7,6 @@
 		<tr>
 			<th>#</th>
 			<th><%= t('Out Date') %></th>
-			<th><%= t('Order#') %></th>
-			<th><%= t('Item#') %></th>
 			<th><%= t('Item Name') %></th>
 			<th><%= t('Spec') %></th>
 			<th><%= t('Out Qty') %></th>				
@@ -25,19 +23,13 @@
 		  <tr>
 		  	<td><%= r.id %></td>
 		  	<td><%= r.out_date.strftime("%Y/%m/%d") %></td>
-		  	<% unless has_action_right?('show', ItemCheckoutx.order_class.to_s.underscore.pluralize, ItemCheckoutx.order_class.find_by_id(r.order_id)) %>
-		  	  <td><%= prt(r, :order_id) %></td>
-		  	<% else %>
-		  	  <td><%= link_to r.order_id.to_s, SUBURI + "/authentify/view_handler?index=1&url=#{SURURI + CGI::escape(eval(ItemCheckoutx.show_order_path))}" %></td>
-		  	<% end %>
-		  	
 		  	<% if has_action_right?('show', ItemCheckoutx.item_class.to_s.underscore.pluralize, ItemCheckoutx.item_class.find_by_id(r.item_id))%>
 		  	  <td><%= link_to r.item_id, SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(ItemCheckoutx.show_item_path))}" %></td>
 		  	<% else %>
 		  	  <td><%= r.item_id %></td>
 		  	<% end %>
-		  	<td><%= prt(r, 'item.name') %></td>
-		  	<td><%= prt(r, 'item.spec') %></td>
+		  	<td><%= prt(r, :name) %></td>
+		  	<td><%= prt(r, :item_spec) %></td>
 		  	<td><%= prt(r, :out_qty) %></td>
 			<td><%= prt(r, :requested_qty) %></td>
 			<td><%= prt(r, :brief_note) %></td>

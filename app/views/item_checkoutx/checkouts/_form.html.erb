@@ -5,8 +5,7 @@
 <%= simple_form_for @checkout do |f| %>    
   <%= f.input :item_id, :label => t("Item#"), :readonly => true, :input_html => {:value => @item.id} %> 
   <%= f.input :name, :label => t("Item Name"), :readonly => true, :input_html => {:value => @item.name} %>
-  <%= f.input :spec, :label => t("Spec"), :readonly => true, :input_html => {:value => @item.spec} %>
-  <%= f.input :order_id, :label => t("Order#"), :collection => eval(ItemCheckoutx.order_collection), :label_method => lambda {|r| t('Order#') + " #{r.id}"}, :value_method => :id %>
+  <%= f.input :item_spec, :label => t("Spec"), :readonly => true, :input_html => {:value => @item.item_spec, :rows => 3} %>
   <%= f.input :out_date, :label => t("Out Date"), :as => :string %> 
   <%= f.input :requested_qty, :label => t("Requested Qty"), :readonly => readonly?(@checkout, 'requested_qty') %>
   <%= f.input :out_qty, :label => t("Out Qty"), :readonly => readonly?(@checkout, 'out_qty') %>
@@ -15,7 +14,7 @@
   <%= f.input :last_updated_by_name, :readonly => true, :input_html => {:value => @checkout.last_updated_by.name}%> 
   
   <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
-  <%= f.button :submit, t('Save') %>  
+  <%= f.button :submit, t('Save'), :class => BUTTONS_CLS['action'] %>  
   
 <% end %>
 

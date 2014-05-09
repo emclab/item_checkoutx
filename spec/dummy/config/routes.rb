@@ -3,21 +3,11 @@ Rails.application.routes.draw do
   mount ItemCheckoutx::Engine => "/item_checkoutx"
   mount Authentify::Engine => "/authentify"
   mount Commonx::Engine => "/commonx"
-  mount InitEventTaskx::Engine => '/event_taskx'
-  mount PurchaseOrderx::Engine => '/purchase_orderx'
   mount Supplierx::Engine => '/supplierx'
-  mount InQuotex::Engine => '/in_quotex'
-  mount JobshopWarehousex::Engine => '/warehousex'
-  mount MfgOrderx::Engine => '/orderx'
-  mount JobshopRfqx::Engine => '/rfqx'
   mount Kustomerx::Engine => '/kustomerx'
-  mount JobshopQuotex::Engine => '/quotex'
-  mount MfgProcessx::Engine => '/processx'
-  mount EventTaskx::Engine => '/event_taskx'
+  mount HeavyMachineryProjectx::Engine => '/project'
   mount Searchx::Engine => '/searchx'
-  mount StateMachineLogx::Engine => '/sm_log'
-  mount BizWorkflowx::Engine => '/wf'
-  mount PettyWarehousex::Engine => '/pw'
+  mount PettyWarehousex::Engine => '/pwhs'
   
   resource :session
   

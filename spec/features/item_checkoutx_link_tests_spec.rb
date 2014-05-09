@@ -40,15 +40,8 @@ describe "LinkTests" do
       user_access = FactoryGirl.create(:user_access, :action => 'show', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
       :sql_code => "record.requested_by_id == session[:user_id]")
       
-      @q_task = FactoryGirl.create(:init_event_taskx_event_task)
-      @q_task1 = FactoryGirl.create(:init_event_taskx_event_task, :name => 'a new name')
-      @supplier = FactoryGirl.create(:supplierx_supplier)
-      @q = FactoryGirl.create(:in_quotex_quote, :task_id => @q_task.id, :supplier_id => @supplier.id)
-      @q1 = FactoryGirl.create(:in_quotex_quote, :task_id => @q_task1.id, :supplier_id => @supplier.id)
-      @o = FactoryGirl.create(:purchase_orderx_order, :quote_id => @q.id)
-      @o1 = FactoryGirl.create(:purchase_orderx_order, :quote_id => @q1.id)
-      @i = FactoryGirl.create(:jobshop_warehousex_item, :purchase_order_id => @o.id)
-      @i1 = FactoryGirl.create(:jobshop_warehousex_item, :purchase_order_id => @o1.id)
+      @i = FactoryGirl.create(:petty_warehousex_item, :in_qty => 100, :stock_qty => 100)
+      @i1 = FactoryGirl.create(:petty_warehousex_item, :in_qty => 100, :name => 'a new name', :stock_qty => 100)
       
       visit '/'
       #save_and_open_page
@@ -63,11 +56,33 @@ describe "LinkTests" do
       page.should have_content('Warehouse Checkouts')
       click_link 'Edit'
       page.should have_content('Edit Warehouse Checkout')
+      fill_in 'checkout_out_qty', :with => 40
+      click_button 'Save'
+      save_and_open_page
+      #bad data
+      visit checkouts_path
+      click_link 'Edit'
+      fill_in 'checkout_out_date', :with => nil
+      click_button 'Save'
+      save_and_open_page
       
       
       visit new_checkout_path(:item_id => @i1.id)
       #save_and_open_page
       page.should have_content('New Warehouse Checkout')
+      fill_in 'checkout_out_qty', :with => 40
+      fill_in 'checkout_out_date', :with => Date.today
+      fill_in 'checkout_requested_qty', :with => 40
+      click_button 'Save'
+      save_and_open_page
+      #bad data
+      visit new_checkout_path(:item_id => @i1.id)
+      fill_in 'checkout_out_qty', :with => 40
+      fill_in 'checkout_out_date', :with => Date.today
+      fill_in 'checkout_requested_qty', :with => 0
+      click_button 'Save'
+      save_and_open_page
+      
     end
   end
 end

@@ -18,15 +18,8 @@ module ItemCheckoutx
       ul = FactoryGirl.build(:user_level, :sys_user_group_id => ug.id)
       @u = FactoryGirl.create(:user, :user_levels => [ul], :user_roles => [ur])
       
-      @q_task = FactoryGirl.create(:init_event_taskx_event_task)
-      @q_task1 = FactoryGirl.create(:init_event_taskx_event_task, :name => 'a new name')
-      @supplier = FactoryGirl.create(:supplierx_supplier)
-      @q = FactoryGirl.create(:in_quotex_quote, :task_id => @q_task.id, :supplier_id => @supplier.id)
-      @q1 = FactoryGirl.create(:in_quotex_quote, :task_id => @q_task1.id, :supplier_id => @supplier.id)
-      @o = FactoryGirl.create(:purchase_orderx_order, :quote_id => @q.id)
-      @o1 = FactoryGirl.create(:purchase_orderx_order, :quote_id => @q1.id)
-      @i = FactoryGirl.create(:jobshop_warehousex_item, :purchase_order_id => @o.id)
-      @i1 = FactoryGirl.create(:jobshop_warehousex_item, :purchase_order_id => @o1.id)
+      @i = FactoryGirl.create(:petty_warehousex_item)
+      @i1 = FactoryGirl.create(:petty_warehousex_item, :name => 'a new name')
     end
     
     render_views

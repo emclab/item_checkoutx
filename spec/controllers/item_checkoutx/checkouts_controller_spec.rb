@@ -9,6 +9,30 @@ module ItemCheckoutx
     end
     
     before(:each) do
+      wf = "def submit
+          wf_common_action('initial_state', 'manager_reviewing', 'submit')
+        end   
+        def manager_approve
+          wf_common_action('manager_reviewing', 'manager_approve')
+        end 
+        def store_manager_reject
+          wf_common_action('manager_reviewing', 'initial_state', 'manager_reject')
+        end
+        def manager_rewind
+          wf_common_action('manager_reviewing', 'initial_state', 'manager_rewind')
+        end
+        def checkout
+          wf_common_action('approved', 'checkout', 'checkedout')
+        end"
+      FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_action_def', :argument_value => wf)
+      final_state = 'rejected, checkedout'
+      FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_final_state_string', :argument_value => final_state)
+      
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
+
+
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)
       z = FactoryGirl.create(:zone, :zone_name => 'hq')
       type = FactoryGirl.create(:group_type, :name => 'employee')
@@ -42,6 +66,38 @@ module ItemCheckoutx
         get 'index', {:use_route => :item_checkoutx}
         assigns(:checkouts).should =~ [q, q1]
       end
+
+      it "returns rejected quotes" do
+        user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "ItemCheckoutx::Checkout.scoped.order('created_at DESC')")
+        session[:user_id] = @u.id
+        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
+        q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
+        q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
+        
+        get 'index', {:use_route => :item_checkoutx}
+        assigns(:checkouts).should =~ [q, q1]
+      end
+
+
+    describe "GET 'list open process" do
+      it "return open process only" do
+        user_access = FactoryGirl.create(:user_access, :action => 'list_open_process', :resource =>'exp_reinbersex_reinberses', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "ExpReinbersex::Reinberse.where(:void => false).order('created_at DESC')")        
+        session[:user_id] = @u.id
+        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
+        q = FactoryGirl.create(:exp_reinbersex_reinberse, :created_at => 50.days.ago, :wf_state => 'initial_state')  #created too long ago to show
+        q1 = FactoryGirl.create(:exp_reinbersex_reinberse, :wf_state => 'ceo_reviewing')
+        q2 = FactoryGirl.create(:exp_reinbersex_reinberse, :wf_state => 'initial_state')
+        q3 = FactoryGirl.create(:exp_reinbersex_reinberse, :wf_state => 'rejected')  #wf_state can't be what was defined.
+        get 'list_open_process', {:use_route => :exp_reinbersex}
+        assigns(:reinberses).should =~ [q1, q2]
+      end
+    end
+
+
+
+
       
       it "should only return the quotes which belongs to the quote task" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,

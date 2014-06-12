@@ -13,6 +13,7 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
       t.string :wfid
       t.integer :requested_qty
       t.integer :checkout_by_id
+      t.string :wf_state
 
       t.timestamps
     end

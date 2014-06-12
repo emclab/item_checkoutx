@@ -5,10 +5,11 @@ module ItemCheckoutx
     before_filter :require_employee
     before_filter :load_parent_record
     
-    def index
+    def index(wf_state=nil)
       @title = t('Warehouse Items')
       @checkouts = params[:item_checkoutx_checkouts][:model_ar_r]
       @checkouts = @checkouts.where(:item_id => @item.id) if @item
+      @checkouts = @checkouts.where(:wf_state => wf_state) if wf_state
       @checkouts = @checkouts.page(params[:page]).per_page(@max_pagination)
       @erb_code = find_config_const('checkout_index_view', 'item_checkoutx_checkouts')
     end
@@ -49,6 +50,10 @@ module ItemCheckoutx
         flash[:notice] = t('Data Error. Not Updated!')
         render 'edit'
       end
+    end
+
+    def list_items(wf_state=nil)  
+      index(wf_state)
     end
 
 =begin  

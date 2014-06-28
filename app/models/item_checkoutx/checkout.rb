@@ -1,28 +1,32 @@
 module ItemCheckoutx
+  require 'workflow'
   class Checkout < ActiveRecord::Base
+
     include Workflow
     workflow_column :wf_state
 
 
-    attr_accessor :name, :spec, :last_updated_by_name
-    attr_accessible :brief_note, :checkout_by_id, :comment, :item_id, :last_updated_by_id, :order_id, :out_date, :out_qty, :requested_by_id, :requested_qty, 
-                    :state, :wfid, :wf_state,
-                    :name, :spec, 
+    attr_accessor :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state_noupdate, :wf_event
+    attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state,  
+                    :name, :item_spec, :wf_state,
                     :as => :role_new
-    attr_accessible :brief_note, :checkout_by_id, :comment, :item_id, :last_updated_by_id, :order_id, :out_date, :out_qty, :requested_by_id, :requested_qty, 
-                    :state, :wfid, :wf_state,
-                    :name, :spec, :last_updated_by_name,
+    attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state, 
+                    :name, :item_spec, :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state,
                     :as => :role_update
+                    
+    attr_accessor :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s
+    attr_accessible :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s,
+                    :as => :role_search_stats
+                    
     belongs_to :last_updated_by, :class_name => 'Authentify::User'
     belongs_to :requested_by, :class_name => 'Authentify::User'
     belongs_to :checkout_by, :class_name => 'Authentify::User'
     belongs_to :item, :class_name => ItemCheckoutx.item_class.to_s
-    belongs_to :order, :class_name => ItemCheckoutx.order_class.to_s
     
-    validates :out_date, :presence => true
-    validates_numericality_of :requested_qty, :item_id, :order_id, :only_integer => true, :greater_than => 0
+    validates :out_date, :name, :item_spec, :presence => true
+    validates_numericality_of :requested_qty, :item_id, :only_integer => true, :greater_than => 0
     validates :out_qty,  :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
-    validates_numericality_of :out_qty, :less_than_or_equal_to => :requested_qty, :message => I18n.t('Requested Qty >= Checkout Qty')
+    validates_numericality_of :out_qty, :less_than_or_equal_to => :requested_qty, :message => I18n.t('Requested Qty <= Checkout Qty')    
     validate :dynamic_validate 
     
     def dynamic_validate
@@ -42,40 +46,28 @@ module ItemCheckoutx
     
     
     workflow do
-      wf = Authentify::AuthentifyUtility.find_config_const('item_checkoutx_wf_pdef', 'item_checkoutx')
+      wf = Authentify::AuthentifyUtility.find_config_const('checkout_wf_pdef', 'item_checkoutx')
       if Authentify::AuthentifyUtility.find_config_const('wf_pdef_in_config') == 'true' && wf.present?
         eval(wf) 
       elsif Rails.env.test?  
         state :initial_state do
-          event :submit, :transitions_to => :manager_reviewing
+          event :submit, :transitions_to => :reviewing
         end
-        state :manager_reviewing do
-          event :manager_approve, :transitions_to => :approved
-          event :manager_reject, :transitions_to => :rejected
-          event :manager_rewind, :transitions_to => :initial_state
+        state :reviewing do
+          event :approve, :transitions_to => :approved
+          event :reject, :transitions_to => :rejected
+          event :rewind, :transitions_to => :initial_state
         end
         state :approved do
           event :checkout, :transitions_to => :checkedout
         end
+        state :rejected do
+          event :rewind, :transitions_to => :initial_state
+        end
+        #state :rejected
         state :checkedout
         
       end
     end
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
   end
 end

@@ -9,9 +9,10 @@ ItemCheckoutx::Engine.routes.draw do
       member do
         get :event_action
         put :submit
-        put :manager_approve
-        put :manager_reject
+        put :approve
+        put :reject
         put :checkout
+        put :rewind
       end
       
       collection do

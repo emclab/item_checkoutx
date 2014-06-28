@@ -5,8 +5,7 @@ FactoryGirl.define do
     quote_id 1
     last_updated_by_id 1
     wfid "MyString"
-    state "MyString"
-    comment "MyText"
+    wf_state "MyString"
     supplier_id 1
     qty 1
     unit "MyString"

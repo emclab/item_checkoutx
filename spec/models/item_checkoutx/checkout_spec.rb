@@ -7,8 +7,13 @@ module ItemCheckoutx
       c.should be_valid
     end
     
-    it "should reject 0 order_id" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, :order_id => 0)
+    it "should reject nil name" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, name: nil)
+      c.should_not be_valid
+    end
+    
+    it "should reject nil item_spec" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, item_spec: nil)
       c.should_not be_valid
     end
     

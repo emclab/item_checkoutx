@@ -2,8 +2,6 @@
 class CreateAuthentifyUserRoles < ActiveRecord::Migration
   def change
     create_table :authentify_user_roles do |t|
-      #t.string :name
-      #t.string :brief_note
       t.integer :last_updated_by_id
       t.integer :role_definition_id
       t.integer :user_id

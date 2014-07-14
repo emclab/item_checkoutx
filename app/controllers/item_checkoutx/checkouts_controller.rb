@@ -6,7 +6,7 @@ module ItemCheckoutx
     before_filter :load_parent_record
     
     def index
-      @title = t('Warehouse Items')
+      @title = t('Checkout Items')
       @checkouts = params[:item_checkoutx_checkouts][:model_ar_r]
       @checkouts = @checkouts.where(:item_id => @item.id) if @item
       @checkouts = @checkouts.where(:wf_state => params[:wf_state]) if params[:wf_state]
@@ -15,8 +15,9 @@ module ItemCheckoutx
     end
   
     def new
-      @title = t('New Warehouse Item')
+      @title = t('New Checkout Item')
       @checkout = ItemCheckoutx::Checkout.new()
+      @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
       @erb_code = find_config_const('checkout_new_view', 'item_checkoutx')
     end
   
@@ -26,10 +27,12 @@ module ItemCheckoutx
       @checkout.requested_by_id = session[:user_id]
       @item = ItemCheckoutx.item_class.find_by_id(params[:checkout][:item_id]) if params[:checkout].present? && params[:checkout][:item_id].present?
       @checkout.transaction do  #need to deduct the qty of checkout from the item.stock_qty
-        @item.stock_qty -= params[:checkout][:out_qty].to_i
-        if @checkout.save && @item.save && @item.stock_qty >= 0
+        stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
+        @item.stock_qty -= params[:checkout][:out_qty].to_i if params[:checkout][:out_qty].present?
+        if @checkout.save && @item.save && stock_enough
           redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
         else
+          @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
           @erb_code = find_config_const('checkout_new_view', 'item_checkoutx')
           flash[:notice] = t('Data Error. Not Saved!')
           render 'new'
@@ -38,8 +41,9 @@ module ItemCheckoutx
     end
   
     def edit
-      @title = t('Update Warehouse Item')
+      @title = t('Update Checkout Item')
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
+      @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
       @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
       if @checkout.wf_state.present? && @checkout.current_state != :initial_state
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
@@ -50,26 +54,32 @@ module ItemCheckoutx
     def update
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
       @checkout.last_updated_by_id = session[:user_id]
-      if @checkout.update_attributes(params[:checkout], :as => :role_update)
+      stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
+      if stock_enough && @checkout.update_attributes(params[:checkout], :as => :role_update)
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       else
+        @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
         @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
         flash[:notice] = t('Data Error. Not Updated!')
         render 'edit'
       end
     end
+    
+    def show
+      @title = t('Checkout Item Info')
+      @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
+      @erb_code = find_config_const('checkout_show_view', 'item_checkoutx')
+    end
 
+    def list_open_process  
+      index()
+      @checkouts = return_open_process(@checkouts, find_config_const('checkout_wf_final_state_string', 'item_checkoutx'))  # ModelName_wf_final_state_string
+    end
+    
     def list_items
       index
     end
 
-=begin  
-    def show
-      @title = t('Warehouse Item Info')
-      @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
-      @erb_code = find_config_const('checkout_show_view', 'item_checkoutx_checkouts')
-    end
-=end
     protected
     def load_parent_record
       @item = ItemCheckoutx.item_class.find_by_id(params[:item_id]) if params[:item_id].present?

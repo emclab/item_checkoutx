@@ -17,6 +17,11 @@ module ItemCheckoutx
       c.should_not be_valid
     end
     
+    it "should reject nil unit" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, unit: nil)
+      c.should_not be_valid
+    end
+    
     it "should reject 0 item_id" do
       c = FactoryGirl.build(:item_checkoutx_checkout, :item_id => 0)
       c.should_not be_valid
@@ -32,8 +37,8 @@ module ItemCheckoutx
       c.should_not be_valid
     end
     
-    it "should reject nil in_out_date" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, :out_date => nil)
+    it "should reject nil in_request_date" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :request_date => nil)
       c.should_not be_valid
     end
     
@@ -47,9 +52,9 @@ module ItemCheckoutx
       c.should be_valid
     end
     
-    it "should reject nil out_qty" do
+    it "should take nil out_qty" do
       c = FactoryGirl.build(:item_checkoutx_checkout, :out_qty => nil)
-      c.should_not be_valid
+      c.should be_valid
     end
   end
 end

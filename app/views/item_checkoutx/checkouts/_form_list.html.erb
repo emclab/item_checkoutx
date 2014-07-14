@@ -3,18 +3,18 @@
   
 <% else %>
 <div class="pagination"><%= will_paginate models %></div>
+<h4><%= @title %></h4>
     <table class="table table-striped">
 		<tr>
 			<th>#</th>
-			<th><%= t('Out Date') %></th>
+			<th><%= t('Request Date') %></th>
 			<th><%= t('Item Name') %></th>
 			<th><%= t('Spec') %></th>
-			<th><%= t('Out Qty') %></th>				
 			<th><%= t('Requested Qty') %></th>
-			<th><%= t('Brief Note') %></th>						
-			<th><%= t('WF State') %></th>
 			<th><%= t('Requested By') %></th>
+			<th><%= t('Out Qty') %></th>				
 			<th><%= t('Checkout By') %></th>
+			<th><%= t('WF State') %></th>
 			<th><%= t('Last Updated By') %></th>
 			<th></th>
 			<th></th>
@@ -22,27 +22,29 @@
 		</tr>
 		<% models.each do |r| %>
 		  <tr>
-		  	<td><%= r.id %></td>
-		  	<td><%= r.out_date.strftime("%Y/%m/%d") %></td>
-		  	<% if has_action_right?('show', ItemCheckoutx.item_class.to_s.underscore.pluralize, ItemCheckoutx.item_class.find_by_id(r.item_id))%>
-		  	  <td><%= link_to r.item_id, SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(ItemCheckoutx.show_item_path))}" %></td>
+		  	<% if has_action_right?('show', params[:controller], r) %>
+		  	  <td><%= link_to r.id, SUBURI + "/authentify/view_handler?index=1&url=#{checkout_path(r)}" %></td>
 		  	<% else %>
-		  	  <td><%= r.item_id %></td>
+		  	  <td><%= r.id %></td>
 		  	<% end %>
-		  	<td><%= prt(r, :name) %></td>
+		  	<td><%= r.request_date.strftime("%Y/%m/%d") %></td>
+		  	<% if has_action_right?('show', ItemCheckoutx.item_class.to_s.underscore.pluralize, ItemCheckoutx.item_class.find_by_id(r.item_id))%>
+		  	  <td><%= link_to r.name, SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(ItemCheckoutx.show_item_path))}" %></td>
+		  	<% else %>
+		  	  <td><%= r.name %></td>
+		  	<% end %>
 		  	<td><%= prt(r, :item_spec) %></td>
-		  	<td><%= prt(r, :out_qty) %></td>
-			<td><%= prt(r, :requested_qty) %></td>
-			<td><%= prt(r, :brief_note) %></td>
+		  	<td><%= prt(r, :requested_qty) %></td>
+			<td><%= prt(r, 'requested_by.name') if r.requested_by_id.present? %></td> 
+			<td><%= prt(r, :out_qty) %></td>
+			<td><%= prt(r, 'checkout_by.name') if r.checkout_by_id.present? %></td>
 			<td><%= t(prt(r, :wf_state).humanize.titleize) if r.wf_state.present? %></td>			
-			<td><%= prt(r, 'requested_by.name') %></td> 
-			<td><%= prt(r, 'checkout_by.name') %></td>
-			<td><%= prt(r, 'last_updated_by.name') %></td>    
+			<td><%= prt(r, 'last_updated_by.name') if r.last_updated_by_id.present? %></td>    
 			<td><%= link_to t('Submit Checkout'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'submit', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'initial_state' && has_action_right?('submit', params[:controller], r) %></td>
 			<td><%= link_to t('Approve'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'approve', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'reviewing' && has_action_right?('approve', params[:controller], r) %></td>
 			<td><%= link_to t('Reject'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'reject', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'reviewing' && has_action_right?('reject', params[:controller], r) %></td>
-            <td><%= link_to t('Rewind'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'rewind', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'rejected' && has_action_right?('rewind', params[:controller], r) %></td>
-		    <td><%= link_to t('Checkout'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'checkout', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'approved' && has_action_right?('checkout', params[:controller], r) %></td>
+            <td><%= link_to t('Rewind'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'rewind', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'reviewing' && has_action_right?('rewind', params[:controller], r) %></td>
+		    <td><%= link_to t('Release'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_checkout_path(r, :wf_event => 'release', :resource_id => r.id, :item_id => r.item_id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'approved' && has_action_right?('release', params[:controller], r) %></td>
 			<td><%= link_to t('Edit'), SUBURI + "/authentify/view_handler?index=1&url=#{edit_checkout_path(r)}", :class => BUTTONS_CLS['action']  if has_action_right?('update', params[:controller], r) %></td>
 			
 		  </tr>

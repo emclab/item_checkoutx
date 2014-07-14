@@ -12,7 +12,7 @@ gem "will_paginate"
 gem 'authentify', :path => '../authentify'  #for rspec test
 gem 'commonx', :path => '../commonx'
 gem 'supplierx', :path => '../supplierx'
-gem 'heavy_machinery_projectx', :path => '../heavy_machinery_projectx'
+gem 'ext_construction_projectx', :path => '../ext_construction_projectx'
 gem 'kustomerx', :path => '../kustomerx'
 gem 'searchx', :path => '../searchx'
 gem 'petty_warehousex', :path => '../petty_warehousex'

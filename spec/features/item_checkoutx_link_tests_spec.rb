@@ -34,17 +34,29 @@ describe "LinkTests" do
         def rewind
           wf_common_action('rejected', 'initial_state', 'rewind')
         end
-        def checkout
-          wf_common_action('approved', 'checkedout', 'checkout')
+        def release
+          wf_common_action('approved', 'released', 'release')
+          @item.stock_qty -= params[:checkout][:out_qty].to_i if params[:checkout][:out_qty].to_i > 0
+          @item.save if params[:checkout][:out_qty].to_i > 0
         end"
 
-      final_state = 'rejected, checkedout'
+      final_state = 'rejected, released'
       FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_action_def', :argument_value => wf)
       FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_final_state_string', :argument_value => final_state)
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => nil)
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
-      
+      FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'piece_unit', :argument_value => 'piece, set, kg')
+      FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_release_inline', 
+                         :argument_value => "<%= f.input :out_date, :as => :hidden, :input_html => {:value => Date.today} %>
+                                             <%= f.input :requested_qty, :label => t('Request Qty'), :readonly => true, :input_html => {:value => @workflow_model_object.requested_qty} %>
+                                             <%= f.input :out_qty, :label => t('Out Qty') %>
+                                             <%= f.input :released, :as => :hidden, :input_html => {:value => true} %>
+                                           ")
+      FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'validate_checkout_release', 
+                         :argument_value => "errors.add(:out_qty, I18n.t('Not be blank')) if out_qty.blank?
+                                             errors.add(:out_qty, I18n.t('Release not more than requested')) if out_qty > requested_qty
+                                           ")
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)
       z = FactoryGirl.create(:zone, :zone_name => 'hq')
       type = FactoryGirl.create(:group_type, :name => 'employee')
@@ -72,11 +84,14 @@ describe "LinkTests" do
       FactoryGirl.create(:user_access, :action => 'rewind', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
                          :sql_code => "")
 
-      FactoryGirl.create(:user_access, :action => 'checkout', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
+      FactoryGirl.create(:user_access, :action => 'release', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
                          :sql_code => "")
       FactoryGirl.create(:user_access, :action => 'event_action', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
                          :sql_code => "")
 
+      FactoryGirl.create(:user_access, :action => 'list_open_process', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
+                         :sql_code => "")
+      
       FactoryGirl.create(:user_access, :action => 'list_items', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
                          :sql_code => "")
       FactoryGirl.create(:user_access, :action => 'list_submitted_items', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
@@ -87,7 +102,7 @@ describe "LinkTests" do
                          :sql_code => "")
       FactoryGirl.create(:user_access, :action => 'list_checkedout_items', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
                          :sql_code => "")
-
+                         
       @i = FactoryGirl.create(:petty_warehousex_item, :in_qty => 100, :stock_qty => 100)
       @i1 = FactoryGirl.create(:petty_warehousex_item, :in_qty => 100, :name => 'a new name', :stock_qty => 100)
 
@@ -101,54 +116,56 @@ describe "LinkTests" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
       visit checkouts_path
       #save_and_open_page
-      page.should have_content('Warehouse Checkouts')
+      page.should have_content('Checkout Items')
       click_link 'Edit'
-      page.should have_content('Edit Warehouse Checkout')
-      fill_in 'checkout_out_qty', :with => 40
+      page.should have_content('Update Checkout Item')
+      fill_in 'checkout_requested_qty', :with => 40
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
 
       # submit for manager review
       visit checkouts_path
-      save_and_open_page
+      #save_and_open_page
       click_link 'Submit Checkout'
-      save_and_open_page
+      #save_and_open_page
 
       #bad data
       visit checkouts_path
       click_link 'Edit'
-      fill_in 'checkout_out_date', :with => nil
+      fill_in 'checkout_requested_qty', :with => nil
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
 
       visit new_checkout_path(:item_id => @i1.id)
       #save_and_open_page
-      page.should have_content('New Warehouse Checkout')
-      fill_in 'checkout_out_qty', :with => 40
-      fill_in 'checkout_out_date', :with => Date.today
+      page.should have_content('New Checkout Item')
       fill_in 'checkout_requested_qty', :with => 40
+      fill_in 'checkout_request_date', :with => Date.today
+      select('piece', :from => 'checkout_unit')
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
       #bad data
       visit new_checkout_path(:item_id => @i1.id)
-      fill_in 'checkout_out_qty', :with => 40
-      fill_in 'checkout_out_date', :with => Date.today
       fill_in 'checkout_requested_qty', :with => 0
+      fill_in 'checkout_request_date', :with => Date.today
+      select('piece', :from => 'checkout_unit')
       click_button 'Save'
-      save_and_open_page
+      #save_and_open_page
     end
 
     it "should checkout an approved item" do
-      q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'approved')
-      visit checkouts_path  #allow to redirect after save new below
+      q = FactoryGirl.create(:item_checkoutx_checkout, :requested_qty => 10, :item_id => @i.id, :wf_state => 'approved')
+      visit checkouts_path(:item_id => @i.id)  #allow to redirect after save new below
       page.should have_content('Approved')
-      page.should have_content('Warehouse Checkouts')
-      click_link 'Checkout'
-      save_and_open_page
+      page.should have_content('Checkout Items')
+      click_link 'Release'
+      fill_in 'checkout_out_qty', :with => 10
+      #save_and_open_page
       click_button 'Save'
       visit checkouts_path()
-      save_and_open_page
-      page.should have_content('Checkedout')
+      #save_and_open_page
+      page.should have_content('Released')
+      @i.reload.stock_qty.should eq(90)
     end
     
     it "checkout from submit request to final checkout" do
@@ -159,22 +176,23 @@ describe "LinkTests" do
       fill_in 'checkout_wf_comment', :with => 'Submitting checkout'
       click_button 'Save'
       visit checkouts_path
-      save_and_open_page
+      #save_and_open_page
 
       page.should have_content('Reviewing')
       click_link 'Approve'
       fill_in 'checkout_wf_comment', :with => 'Approving checkout'
       click_button 'Save'
       visit checkouts_path
-      save_and_open_page
+      #save_and_open_page
 
       page.should have_content('Approved')
-      click_link 'Checkout'
+      click_link 'Release'
       fill_in 'checkout_wf_comment', :with => 'Checking checkout'
+      fill_in 'checkout_out_qty', :with => q.requested_qty
       click_button 'Save'
       visit checkouts_path
-      save_and_open_page
-      page.should have_content('Checkedout')
+      #save_and_open_page
+      page.should have_content('Released')
     end
 
     it "rewind after rejecting a submited checkout request" do
@@ -188,20 +206,14 @@ describe "LinkTests" do
       save_and_open_page
 
       page.should have_content('Reviewing')
-      click_link 'Reject'
+      click_link 'Rewind'
       fill_in 'checkout_wf_comment', :with => 'Rejecting checkout'
       click_button 'Save'
       visit checkouts_path
-      save_and_open_page
+      #save_and_open_page
 
-      page.should have_content('Rejected')
-      click_link 'Rewind'
-      fill_in 'checkout_wf_comment', :with => 'Rewinding. Please re-submit request'
-      save_and_open_page
-      click_button 'Save'
-      visit checkouts_path
-      save_and_open_page
       page.should have_content('Initial State')
+
     end
 
     it "list submitted request then reviewing requests, then rejected requests" do
@@ -213,7 +225,7 @@ describe "LinkTests" do
       click_button 'Save'
 
       visit list_items_checkouts_path(:wf_state => 'reviewing')
-      save_and_open_page
+      #save_and_open_page
       page.should have_content('Reviewing')
 
       click_link 'Reject'

@@ -11,7 +11,7 @@ ItemCheckoutx::Engine.routes.draw do
         put :submit
         put :approve
         put :reject
-        put :checkout
+        put :release
         put :rewind
       end
       

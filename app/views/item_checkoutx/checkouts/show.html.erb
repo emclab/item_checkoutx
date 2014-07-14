@@ -1,0 +1,78 @@
+<% if @view_in_config && @erb_code %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+<% else %>
+<div id="main_body">
+<h4><%= @title %></h4>
+
+<p>
+  <b><%= t('Item Name') %></b>
+  <%= @checkout.name %>
+</p>
+<p>
+  <b><%= t('Spec') %></b>
+  <%= @checkout.item_spec %>
+</p>
+<p>
+  <b><%= t('Request Date') %></b>
+  <%= @checkout.request_date.strftime("%Y/%m/%d") if @checkout.request_date.present?%>
+</p>
+<p>
+  <b><%= t('Request Qty')  %></b>
+  <%= @checkout.requested_qty %>/<%= @checkout.unit %>
+</p>
+<p>
+  <b><%= t('Requested By') %></b>
+  <%= @checkout.requested_by.name if @checkout.requested_by_id.present? %>
+</p>
+<p>
+  <b><%= t('Out Qty')  %></b>
+  <%= @checkout.out_qty %>/<%= @checkout.unit %>
+</p>
+<p>
+  <b><%= t('Out Date') %></b>
+  <%= @checkout.out_date.strftime("%Y/%m/%d") if @checkout.out_date.present?%>
+</p>
+<p>
+  <b><%= t('Checkout By') %></b>
+  <%= @checkout.checkout_by.name if @checkout.checkout_by_id.present? %>
+</p>
+<p>
+  <b><%= t('Released') %></b>
+  <%= @checkout.released ? t('Yes') : t('No')%>
+</p>
+<p>
+  <b><%= t('Last Updated By') %></b>
+  <%= @checkout.last_updated_by.name if @checkout.last_updated_by_id.present? %>
+</p>
+<p>
+  <b><%= t('WF State') %>:</b>
+  <%= t(@checkout.wf_state.humanize.titleize) if @checkout.wf_state.present? %>
+</p>
+<p>
+<% if @checkout.wf_state.present? %>
+  <b><%=t('Workflow History')%>:</b>
+  <% StateMachineLogx::Log.where('resource_id = ? AND resource_string = ?', @checkout.id, params[:controller]).order('created_at DESC').each do |t| %>
+    <li><%= t.created_at.strftime("%Y/%m/%d") %>,&nbsp; <%= t.action_by_name %>,&nbsp; <%=t(t.from)%>,&nbsp; <%=t(t.event.capitalize) %>,&nbsp; <%=t(t.to)%>,&nbsp;<%= t.comment %> </li>
+  <% end %>
+<% end %>	
+</p>
+<p>
+  <b>LOG：</b>
+  <% Commonx::Log.where('resource_id = ? AND resource_name = ?', @checkout.id, params[:controller].sub('/', '_')).order("created_at DESC").each do |t| %>
+    <li><%= t.created_at.strftime("%Y/%m/%d") %>,&nbsp; <%= t.last_updated_by.name %>,&nbsp; <%= t.log %> </li>
+  <% end %>
+</p>
+   <table class="table table-striped">
+	  <tr>
+	    <th>
+  	  	  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :id => 'close', :class => BUTTONS_CLS['action'] %>
+ 		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  <%= link_to t('New Log'), SUBURI + commonx.new_log_path(:resource_id => @checkout.id, :resource_name => params[:controller], :subaction => 'warehouse_item', :format => :js), :remote => true, 
+                          :id => 'new_log_link', :class => BUTTONS_CLS['action'] if has_action_right?('create_warehouse_item', 'commonx/logs') %>
+        </th>
+	  </tr>
+	</table>    	
+</div>
+
+<% end %>

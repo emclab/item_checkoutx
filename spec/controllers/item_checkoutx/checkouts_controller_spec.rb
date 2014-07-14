@@ -31,7 +31,7 @@ module ItemCheckoutx
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
-
+      FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'piece_unit', :argument_value => 'piece, set, kg')
 
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)
       z = FactoryGirl.create(:zone, :zone_name => 'hq')
@@ -42,8 +42,8 @@ module ItemCheckoutx
       ul = FactoryGirl.build(:user_level, :sys_user_group_id => ug.id)
       @u = FactoryGirl.create(:user, :user_levels => [ul], :user_roles => [ur])
       
-      @i = FactoryGirl.create(:petty_warehousex_item)
-      @i1 = FactoryGirl.create(:petty_warehousex_item, :name => 'a new name')
+      @i = FactoryGirl.create(:petty_warehousex_item, :in_qty => 100, :stock_qty => 100)
+      @i1 = FactoryGirl.create(:petty_warehousex_item, :name => 'a new name', :in_qty => 100, :stock_qty => 100)
     end
     
     render_views
@@ -141,7 +141,7 @@ module ItemCheckoutx
         :sql_code => "")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :out_qty => nil)
+        q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :requested_qty => nil)
         get 'create', {:use_route => :item_checkoutx, :item_id => @i1.id, :checkout => q}
         response.should render_template('new')
       end
@@ -179,9 +179,18 @@ module ItemCheckoutx
         get 'update', {:use_route => :item_checkoutx, :id => q.id, :checkout => {:requested_qty => 0}}
         response.should render_template('edit')
       end
+      
+      it "should reject if requested_qyt is greater than stock_qty" do
+        user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "")
+        session[:user_id] = @u.id
+        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
+        q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :last_updated_by_id => @u.id)
+        get 'update', {:use_route => :item_checkoutx, :id => q.id, :checkout => {:requested_qty => 120}}
+        response.should render_template('edit')
+      end
     end
-
-=begin  
+ 
     describe "GET 'show'" do
       it "returns http success" do
         user_access = FactoryGirl.create(:user_access, :action => 'show', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
@@ -193,6 +202,6 @@ module ItemCheckoutx
         response.should be_success
       end
     end
-=end
+
   end
 end

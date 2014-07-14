@@ -17,6 +17,7 @@ ItemCheckoutx::Engine.routes.draw do
       
       collection do
         get :list_items
+        get :list_open_process
       end
       
       

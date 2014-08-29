@@ -6,16 +6,17 @@ module ItemCheckoutx
     workflow_column :wf_state
 
 
-    attr_accessor :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state_noupdate, :wf_event
+    attr_accessor :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state_noupdate, :wf_event, :requested_by_name, :checkout_by_name
     attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state,  
-                    :name, :item_spec, :wf_state, :request_date, :checkout, :unit, 
+                    :name, :item_spec, :wf_state, :request_date, :unit, 
                     :as => :role_new
     attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state, 
-                    :name, :item_spec, :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state, :request_date, :checkout, :unit, :released,
+                    :name, :item_spec, :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state, :request_date, :unit, :released, 
+                    :requested_by_name, :checkout_by_name,
                     :as => :role_update
                     
-    attr_accessor :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s, :outed_s
-    attr_accessible :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s, :outed_s,
+    attr_accessor :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s, :released_s
+    attr_accessible :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s, :released_s,
                     :as => :role_search_stats
                     
     belongs_to :last_updated_by, :class_name => 'Authentify::User'
@@ -30,7 +31,7 @@ module ItemCheckoutx
     validate :dynamic_validate 
     
     def dynamic_validate
-      wf = Authentify::AuthentifyUtility.find_config_const('dynamic_validate', 'exp_reinbersex')
+      wf = Authentify::AuthentifyUtility.find_config_const('dynamic_validate', 'item_checkoutx')
       eval(wf) if wf.present?
     end        
                                           

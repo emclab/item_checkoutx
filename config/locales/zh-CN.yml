@@ -76,3 +76,7 @@ zh-CN:
   Release not more than requested : '出库数量不能超过申请数量！'
   Released : '已出库'
   Release : '出库'
+  '>= 0' : '出库数量非负数'
+  Item Checkout : '出库记录'
+  New Checkout : '新出库'
+  'Item#' : '库存#'

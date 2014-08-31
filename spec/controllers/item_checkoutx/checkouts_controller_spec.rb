@@ -131,9 +131,11 @@ module ItemCheckoutx
         :sql_code => "")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id)
+        q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :out_qty => 10, :requested_qty => 10)
         get 'create', {:use_route => :item_checkoutx, :item_id => @i1.id, :checkout => q}
         response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
+        assigns(:checkout).out_qty.should eq(10)
+        assigns(:item).stock_qty.should eq(90)
       end
       
       it "should render new with data error" do

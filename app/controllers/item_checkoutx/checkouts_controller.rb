@@ -25,6 +25,7 @@ module ItemCheckoutx
       @checkout = ItemCheckoutx::Checkout.new(params[:checkout], :as => :role_new)
       @checkout.last_updated_by_id = session[:user_id]
       @checkout.requested_by_id = session[:user_id]
+      @checkout.checkout_by_id = session[:user_id]
       @item = ItemCheckoutx.item_class.find_by_id(params[:checkout][:item_id]) if params[:checkout].present? && params[:checkout][:item_id].present?
       @checkout.transaction do  #need to deduct the qty of checkout from the item.stock_qty
         stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)

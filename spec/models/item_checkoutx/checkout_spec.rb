@@ -37,9 +37,9 @@ module ItemCheckoutx
       c.should_not be_valid
     end
     
-    it "should reject nil in_request_date" do
+    it "should take nil in_request_date" do
       c = FactoryGirl.build(:item_checkoutx_checkout, :request_date => nil)
-      c.should_not be_valid
+      c.should be_valid
     end
     
     it "should reject if requested_qty <= out_qty" do

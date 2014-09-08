@@ -8,7 +8,7 @@ module ItemCheckoutx
 
     attr_accessor :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state_noupdate, :wf_event, :requested_by_name, :checkout_by_name
     attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state,  
-                    :name, :item_spec, :wf_state, :request_date, :unit, 
+                    :name, :item_spec, :wf_state, :request_date, :unit,
                     :as => :role_new
     attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state, 
                     :name, :item_spec, :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state, :request_date, :unit, :released, 
@@ -24,7 +24,7 @@ module ItemCheckoutx
     belongs_to :checkout_by, :class_name => 'Authentify::User'
     belongs_to :item, :class_name => ItemCheckoutx.item_class.to_s
     
-    validates :request_date, :name, :item_spec, :unit, :presence => true
+    validates :name, :item_spec, :unit, :presence => true
     validates_numericality_of :requested_qty, :item_id, :only_integer => true, :greater_than => 0
     validates :out_qty, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}, :if => 'out_qty.present?'
     validates_numericality_of :out_qty, :less_than_or_equal_to => :requested_qty, :message => I18n.t('Requested Qty <= Checkout Qty'), :if => 'out_qty.present?'   

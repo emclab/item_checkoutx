@@ -16,6 +16,7 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
       t.date :out_date
       t.string :wf_state
       t.boolean :released, :default => false
+      t.boolean :skip_wf, :default => false
       t.timestamps
     end
     
@@ -23,5 +24,6 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
     add_index :item_checkoutx_checkouts, :wf_state
     add_index :item_checkoutx_checkouts, :name
     add_index :item_checkoutx_checkouts, :item_spec
+    add_index :item_checkoutx_checkouts, :skip_wf
   end
 end

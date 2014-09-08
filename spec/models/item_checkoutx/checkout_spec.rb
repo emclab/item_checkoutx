@@ -56,5 +56,10 @@ module ItemCheckoutx
       c = FactoryGirl.build(:item_checkoutx_checkout, :out_qty => nil)
       c.should be_valid
     end
+    
+    it "should take nil skip_wf" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :skip_wf => nil)
+      c.should be_valid
+    end
   end
 end

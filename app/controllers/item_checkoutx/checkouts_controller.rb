@@ -85,6 +85,7 @@ module ItemCheckoutx
     def load_parent_record
       @item = ItemCheckoutx.item_class.find_by_id(params[:item_id]) if params[:item_id].present?
       @item = ItemCheckoutx.item_class.find_by_id(ItemCheckoutx::Checkout.find_by_id(params[:id]).item_id) if params[:id].present?
+      @project_id = params[:project_id].to_i if params[:project_id].present?
     end
   end
 end

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   mount ExtConstructionProjectx::Engine => '/project'
   mount Searchx::Engine => '/searchx'
   mount PettyWarehousex::Engine => '/pwhs'
+  mount MaterialRequisitionx::Engine => 'material_requisition'
   
   resource :session
   

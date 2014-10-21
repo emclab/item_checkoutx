@@ -18,6 +18,7 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
       t.boolean :released, :default => false
       t.boolean :skip_wf, :default => false
       t.timestamps
+      t.integer :material_requisition_id
     end
     
     add_index :item_checkoutx_checkouts, :item_id
@@ -25,5 +26,6 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
     add_index :item_checkoutx_checkouts, :name
     add_index :item_checkoutx_checkouts, :item_spec
     add_index :item_checkoutx_checkouts, :skip_wf
+    add_index :item_checkoutx_checkouts, :material_requisition_id
   end
 end

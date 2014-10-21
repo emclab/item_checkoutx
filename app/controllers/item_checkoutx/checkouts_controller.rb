@@ -46,7 +46,7 @@ module ItemCheckoutx
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
       @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
       @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
-      if @checkout.wf_state.present? && @checkout.current_state != :initial_state
+      if !@checkout.skip_wf && @checkout.wf_state.present? && @checkout.current_state != :initial_state
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
       end
 
@@ -54,15 +54,16 @@ module ItemCheckoutx
   
     def update
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
-      @checkout.last_updated_by_id = session[:user_id]
-      stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
-      if stock_enough && @checkout.update_attributes(params[:checkout], :as => :role_update)
-        redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
-      else
-        @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
-        @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
-        flash[:notice] = t('Data Error. Not Updated!')
-        render 'edit'
+      if !(!@checkout.skip_wf && @checkout.wf_state.present? && @checkout.current_state != :initial_state)
+        stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
+        if stock_enough && @checkout.update_attributes(params[:checkout], :as => :role_update)
+          redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        else
+          @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
+          @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
+          flash[:notice] = t('Data Error. Not Updated!')
+          render 'edit'
+        end
       end
     end
     
@@ -85,6 +86,7 @@ module ItemCheckoutx
     def load_parent_record
       @item = ItemCheckoutx.item_class.find_by_id(params[:item_id]) if params[:item_id].present?
       @item = ItemCheckoutx.item_class.find_by_id(ItemCheckoutx::Checkout.find_by_id(params[:id]).item_id) if params[:id].present?
+      @project_id = params[:project_id].to_i if params[:project_id].present?
     end
   end
 end

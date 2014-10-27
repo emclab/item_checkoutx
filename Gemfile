@@ -18,7 +18,6 @@ gem 'searchx', :path => '../searchx'
 gem 'petty_warehousex', :path => '../petty_warehousex'
 gem 'state_machine_logx', :path => '../state_machine_logx'
 gem 'biz_workflowx', :path => '../biz_workflowx'
-gem 'material_requisitionx', :path => '../material_requisitionx'
 
 
 # Declare any dependencies that are still in development here instead of in

@@ -14,7 +14,6 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
       t.integer :requested_qty
       t.integer :checkout_by_id
       t.date :out_date
-      t.string :wf_state
       t.boolean :released, :default => false
       t.boolean :skip_wf, :default => false
       t.timestamps

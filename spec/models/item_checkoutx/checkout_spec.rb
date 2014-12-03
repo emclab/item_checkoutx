@@ -61,5 +61,15 @@ module ItemCheckoutx
       c = FactoryGirl.build(:item_checkoutx_checkout, :skip_wf => nil)
       c.should be_valid
     end
+    
+    it "should take 0 unit price" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :unit_price => 0) 
+      c.should be_valid
+    end
+    
+    it "should take nil unit price" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :unit_price => nil) 
+      c.should be_valid
+    end
   end
 end

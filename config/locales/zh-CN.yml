@@ -80,4 +80,4 @@ zh-CN:
   Item Checkout : '出库记录'
   New Checkout : '新出库'
   'Item#' : '库存#'
-   Unit Price($) : '单价（￥）'
+  'Unit Price($)' : '单价（￥）'

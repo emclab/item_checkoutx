@@ -8,10 +8,10 @@ module ItemCheckoutx
 
     attr_accessor :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state_noupdate, :wf_event, :requested_by_name, :checkout_by_name, :skip_wf_noupdate
     attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state,  
-                    :name, :item_spec, :request_date, :unit, :skip_wf, :whs_string, :unit_price,
+                    :name, :item_spec, :request_date, :unit, :skip_wf, :whs_string, 
                     :as => :role_new
     attr_accessible :brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state, 
-                    :name, :item_spec, :last_updated_by_name, :id_noupdate, :wf_comment, :request_date, :unit, :released, :skip_wf, :unit_price,
+                    :name, :item_spec, :last_updated_by_name, :id_noupdate, :wf_comment, :request_date, :unit, :released, :skip_wf,
                     :requested_by_name, :checkout_by_name, :skip_wf_noupdate, 
                     :as => :role_update
                     
@@ -30,7 +30,6 @@ module ItemCheckoutx
     validates_numericality_of :requested_qty, :item_id, :only_integer => true, :greater_than => 0
     validates :out_qty, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}, :if => 'out_qty.present?'
     validates_numericality_of :out_qty, :less_than_or_equal_to => :requested_qty, :message => I18n.t('Requested Qty <= Checkout Qty'), :if => 'out_qty.present?' 
-    validates :unit_price, :numericality => {:greater_than_or_equal_to => 0}, :if => 'unit_price.present?'  
     validate :dynamic_validate 
     
     def dynamic_validate

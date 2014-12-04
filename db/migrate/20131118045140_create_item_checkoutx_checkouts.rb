@@ -18,7 +18,6 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
       t.boolean :skip_wf, :default => false
       t.timestamps
       t.string :whs_string   #warehouse name. used to allow access to each individual whs.
-      t.decimal :unit_price, :precision => 10, :scale => 2
       
     end
     

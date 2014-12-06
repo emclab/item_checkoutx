@@ -16,9 +16,9 @@ module ItemCheckoutx
                     :as => :role_update
                     
     attr_accessor :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s, :released_s, :skip_wf_s,
-                  :whs_string
+                  :whs_string_s
     attr_accessible :start_date_s, :end_date_s, :time_frame_s, :name_s, :requested_by_id_s, :checkout_by_id_s, :item_spec_s, :item_id_s, :released_s, :skip_wf_s,
-                    :whs_string,
+                    :whs_string_s,
                     :as => :role_search_stats
                     
     belongs_to :last_updated_by, :class_name => 'Authentify::User'

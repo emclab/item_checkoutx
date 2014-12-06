@@ -8,6 +8,7 @@ module ItemCheckoutx
     def index
       @title = t('Checkout Items')
       @checkouts = params[:item_checkoutx_checkouts][:model_ar_r]
+      @checkouts = @checkouts.where(:whs_string => @whs_string) if @whs_string
       @checkouts = @checkouts.where(:item_id => @item.id) if @item
       @checkouts = @checkouts.where(:wf_state => params[:wf_state]) if params[:wf_state]
       @checkouts = @checkouts.page(params[:page]).per_page(@max_pagination)
@@ -87,6 +88,7 @@ module ItemCheckoutx
       @item = ItemCheckoutx.item_class.find_by_id(params[:item_id]) if params[:item_id].present?
       @item = ItemCheckoutx.item_class.find_by_id(ItemCheckoutx::Checkout.find_by_id(params[:id]).item_id) if params[:id].present?
       @project_id = params[:project_id].to_i if params[:project_id].present?
+      @whs_string = params[:whs_string].strip if params[:whs_string].present?
     end
   end
 end

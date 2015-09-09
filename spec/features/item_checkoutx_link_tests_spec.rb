@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe "LinkTests" do
+RSpec.describe "LinkTests", type: :request do
   describe "GET /checkoutx_link_tests" do
     mini_btn = 'btn btn-mini '
     ActionView::CompiledTemplates::BUTTONS_CLS =
@@ -19,7 +19,11 @@ describe "LinkTests" do
          'inverse'      => 'btn btn-inverse',
          'mini-inverse' => mini_btn + 'btn btn-inverse',
          'link'         => 'btn btn-link',
-         'mini-link'    => mini_btn +  'btn btn-link'
+         'mini-link'    => mini_btn +  'btn btn-link',
+         'right-span#'         => '2', 
+               'left-span#'         => '6', 
+               'offset#'         => '2',
+               'form-span#'         => '4'
         }
     before(:each) do
       wf = "def submit
@@ -114,38 +118,38 @@ describe "LinkTests" do
     end
     it "works! (now write some real specs)" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       #save_and_open_page
-      page.should have_content('Checkout Items')
+      expect(page).to have_content('Checkout Items')
       click_link 'Edit'
-      page.should have_content('Update Checkout Item')
+      expect(page).to have_content('Update Checkout Item')
       fill_in 'checkout_requested_qty', :with => 40
       click_button 'Save'
       #save_and_open_page
 
       # submit for manager review
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       #save_and_open_page
       click_link 'Submit Checkout'
       #save_and_open_page
 
       #bad data
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       click_link 'Edit'
       fill_in 'checkout_requested_qty', :with => nil
       click_button 'Save'
       #save_and_open_page
 
-      visit new_checkout_path(:item_id => @i1.id)
+      visit item_checkoutx.new_checkout_path(:item_id => @i1.id)
       #save_and_open_page
-      page.should have_content('New Checkout Item')
+      expect(page).to have_content('New Checkout Item')
       fill_in 'checkout_requested_qty', :with => 40
       fill_in 'checkout_request_date', :with => Date.today
       select('piece', :from => 'checkout_unit')
       click_button 'Save'
       #save_and_open_page
       #bad data
-      visit new_checkout_path(:item_id => @i1.id)
+      visit item_checkoutx.new_checkout_path(:item_id => @i1.id)
       fill_in 'checkout_requested_qty', :with => 0
       fill_in 'checkout_request_date', :with => Date.today
       select('piece', :from => 'checkout_unit')
@@ -155,84 +159,84 @@ describe "LinkTests" do
 
     it "should checkout an approved item" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :requested_qty => 10, :item_id => @i.id, :wf_state => 'approved')
-      visit checkouts_path(:item_id => @i.id)  #allow to redirect after save new below
-      page.should have_content('Approved')
-      page.should have_content('Checkout Items')
+      visit item_checkoutx.checkouts_path(:item_id => @i.id)  #allow to redirect after save new below
+      expect(page).to have_content('Approved')
+      expect(page).to have_content('Checkout Items')
       click_link 'Release'
       fill_in 'checkout_out_qty', :with => 10
       #save_and_open_page
       click_button 'Save'
-      visit checkouts_path()
+      visit item_checkoutx.checkouts_path()
       #save_and_open_page
-      page.should have_content('Released')
+      expect(page).to have_content('Released')
       @i.reload.stock_qty.should eq(90)
     end
     
     it "checkout from submit request to final checkout" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'initial_state')
-      visit checkouts_path
-      page.should have_content('Submit Checkout')
+      visit item_checkoutx.checkouts_path
+      expect(page).to have_content('Submit Checkout')
       click_link 'Submit Checkout'
       fill_in 'checkout_wf_comment', :with => 'Submitting checkout'
       click_button 'Save'
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       #save_and_open_page
 
-      page.should have_content('Reviewing')
+      expect(page).to have_content('Reviewing')
       click_link 'Approve'
       fill_in 'checkout_wf_comment', :with => 'Approving checkout'
       click_button 'Save'
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       #save_and_open_page
 
-      page.should have_content('Approved')
+      expect(page).to have_content('Approved')
       click_link 'Release'
       fill_in 'checkout_wf_comment', :with => 'Checking checkout'
       fill_in 'checkout_out_qty', :with => q.requested_qty
       click_button 'Save'
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       #save_and_open_page
-      page.should have_content('Released')
+      expect(page).to have_content('Released')
     end
 
     it "rewind after rejecting a submited checkout request" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'initial_state')
-      visit checkouts_path
-      page.should have_content('Submit Checkout')
+      visit item_checkoutx.checkouts_path
+      expect(page).to have_content('Submit Checkout')
       click_link 'Submit Checkout'
       fill_in 'checkout_wf_comment', :with => 'Submitting checkout'
       click_button 'Save'
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       save_and_open_page
 
-      page.should have_content('Reviewing')
+      expect(page).to have_content('Reviewing')
       click_link 'Rewind'
       fill_in 'checkout_wf_comment', :with => 'Rejecting checkout'
       click_button 'Save'
-      visit checkouts_path
+      visit item_checkoutx.checkouts_path
       #save_and_open_page
 
-      page.should have_content('Initial State')
+      expect(page).to have_content('Initial State')
 
     end
 
     it "list submitted request then reviewing requests, then rejected requests" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'initial_state')
-      visit list_items_checkouts_path(:wf_state => 'initial_state')
-      page.should have_content('Submit Checkout')
+      visit item_checkoutx.checkouts_path(:wf_state => 'initial_state')
+      expect(page).to have_content('Submit Checkout')
       click_link 'Submit Checkout'
       fill_in 'checkout_wf_comment', :with => 'Submitting checkout'
       click_button 'Save'
 
-      visit list_items_checkouts_path(:wf_state => 'reviewing')
+      visit item_checkoutx.checkouts_path(:wf_state => 'reviewing')
       #save_and_open_page
-      page.should have_content('Reviewing')
+      expect(page).to have_content('Reviewing')
 
       click_link 'Reject'
       fill_in 'checkout_wf_comment', :with => 'Rejecting checkout'
       click_button 'Save'
-      visit list_items_checkouts_path(:wf_state => 'rejected')
-      page.should have_content('Rejected')
+      visit item_checkoutx.checkouts_path(:wf_state => 'rejected')
+      expect(page).to have_content('Rejected')
     end
 
   end

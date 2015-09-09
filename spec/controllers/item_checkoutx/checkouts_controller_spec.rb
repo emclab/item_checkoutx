@@ -1,10 +1,11 @@
-require 'spec_helper'
+require 'rails_helper'
 
 module ItemCheckoutx
-  describe CheckoutsController do
+  RSpec.describe CheckoutsController, type: :controller do
+    routes {ItemCheckoutx::Engine.routes}
     before(:each) do
-      controller.should_receive(:require_signin)
-      controller.should_receive(:require_employee)
+      expect(controller).to receive(:require_signin)
+      expect(controller).to receive(:require_employee)
       
     end
     
@@ -44,6 +45,8 @@ module ItemCheckoutx
       
       @i = FactoryGirl.create(:petty_warehousex_item, :in_qty => 100, :stock_qty => 100)
       @i1 = FactoryGirl.create(:petty_warehousex_item, :name => 'a new name', :in_qty => 100, :stock_qty => 100)
+      
+      session[:user_role_ids] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id).user_role_ids
     end
     
     render_views
@@ -51,66 +54,61 @@ module ItemCheckoutx
     describe "GET 'index'" do
       it "returns all items" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "ItemCheckoutx::Checkout.scoped.order('created_at DESC')")
+        :sql_code => "ItemCheckoutx::Checkout.order('created_at DESC')")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
         q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'rejected')
         q2 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
         q3 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :wf_state => 'approved')
-        get 'index', {:use_route => :item_checkoutx}
-        assigns(:checkouts).should =~ [q, q1, q2, q3]
+        get 'index'
+        expect(assigns(:checkouts)).to match_array( [q, q1, q2, q3])
       end
 
       it "returns approved items" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "ItemCheckoutx::Checkout.scoped.order('created_at DESC')")
+        :sql_code => "ItemCheckoutx::Checkout.order('created_at DESC')")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
         q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'approved')
         q2 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
         
-        get 'index', {:use_route => :item_checkoutx, :wf_state => 'approved'}
-        assigns(:checkouts).should =~ [q1]
+        get 'index', { :wf_state => 'approved'}
+        expect(assigns(:checkouts)).to match_array( [q1])
       end
 
       it "returns rejected items" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
-                                         :sql_code => "ItemCheckoutx::Checkout.scoped.order('created_at DESC')")
+                                         :sql_code => "ItemCheckoutx::Checkout.order('created_at DESC')")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
         q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'rejected')
         q2 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
 
-        get 'index', {:use_route => :item_checkoutx, :wf_state => 'rejected'}
-        assigns(:checkouts).should =~ [q1]
+        get 'index', { :wf_state => 'rejected'}
+        expect(assigns(:checkouts)).to match_array( [q1])
       end
 
       it "returns checkedout items" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "ItemCheckoutx::Checkout.scoped.order('created_at DESC')")
+        :sql_code => "ItemCheckoutx::Checkout.order('created_at DESC')")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
         q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'approved')
         q2 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
         
-        get 'index', {:use_route => :item_checkoutx, :wf_state => 'approved'}
-        assigns(:checkouts).should =~ [q1]
+        get 'index', { :wf_state => 'approved'}
+        expect(assigns(:checkouts)).to match_array( [q1])
       end
 
       
       it "should only return the quotes which belongs to the quote task" do
         user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "ItemCheckoutx::Checkout.scoped.order('created_at DESC')")
+        :sql_code => "ItemCheckoutx::Checkout.order('created_at DESC')")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
         q1 = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id)
-        get 'index', {:use_route => :item_checkoutx, :item_id => @i1.id}
-        assigns(:checkouts).should =~ [q1]
+        get 'index', { :item_id => @i1.id}
+        expect(assigns(:checkouts)).to match_array( [q1])
       end
     end
   
@@ -119,9 +117,8 @@ module ItemCheckoutx
         user_access = FactoryGirl.create(:user_access, :action => 'create', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        get 'new', {:use_route => :item_checkoutx, :item_id => @i.id}
-        response.should be_success
+        get 'new', { :item_id => @i.id}
+        expect(response).to be_success
       end
     end
   
@@ -130,10 +127,9 @@ module ItemCheckoutx
         user_access = FactoryGirl.create(:user_access, :action => 'create', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :out_qty => 10, :requested_qty => 10)
-        get 'create', {:use_route => :item_checkoutx, :item_id => @i1.id, :checkout => q}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
+        get 'create', { :item_id => @i1.id, :checkout => q}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
         assigns(:checkout).out_qty.should eq(10)
         assigns(:item).stock_qty.should eq(90)
       end
@@ -142,10 +138,9 @@ module ItemCheckoutx
         user_access = FactoryGirl.create(:user_access, :action => 'create', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :requested_qty => nil)
-        get 'create', {:use_route => :item_checkoutx, :item_id => @i1.id, :checkout => q}
-        response.should render_template('new')
+        get 'create', { :item_id => @i1.id, :checkout => q}
+        expect(response).to render_template('new')
       end
     end
   
@@ -154,10 +149,9 @@ module ItemCheckoutx
         user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :last_updated_by_id => @u.id)
-        get 'edit', {:use_route => :item_checkoutx, :id => q.id}
-        response.should be_success
+        get 'edit', { :id => q.id}
+        expect(response).to be_success
       end
     end
   
@@ -166,30 +160,27 @@ module ItemCheckoutx
         user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :last_updated_by_id => @u.id)
-        get 'update', {:use_route => :item_checkoutx, :id => q.id, :checkout => {:requested_qty => 20}}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        get 'update', { :id => q.id, :checkout => {:requested_qty => 20}}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       end
       
       it "should render edit with data error" do
         user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :last_updated_by_id => @u.id)
-        get 'update', {:use_route => :item_checkoutx, :id => q.id, :checkout => {:requested_qty => 0}}
-        response.should render_template('edit')
+        get 'update', { :id => q.id, :checkout => {:requested_qty => 0}}
+        expect(response).to render_template('edit')
       end
       
       it "should reject if requested_qyt is greater than stock_qty" do
         user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :last_updated_by_id => @u.id)
-        get 'update', {:use_route => :item_checkoutx, :id => q.id, :checkout => {:requested_qty => 120}}
-        response.should render_template('edit')
+        get 'update', { :id => q.id, :checkout => {:requested_qty => 120}}
+        expect(response).to render_template('edit')
       end
     end
  
@@ -198,10 +189,9 @@ module ItemCheckoutx
         user_access = FactoryGirl.create(:user_access, :action => 'show', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "record.checkout_by_id == session[:user_id]")
         session[:user_id] = @u.id
-        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :checkout_by_id => @u.id, :last_updated_by_id => @u.id)
-        get 'show', {:use_route => :item_checkoutx, :id => q.id }
-        response.should be_success
+        get 'show', { :id => q.id }
+        expect(response).to be_success
       end
     end
 

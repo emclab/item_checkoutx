@@ -2,8 +2,8 @@ require_dependency "item_checkoutx/application_controller"
 
 module ItemCheckoutx
   class CheckoutsController < ApplicationController
-    before_filter :require_employee
-    before_filter :load_parent_record
+    before_action :require_employee
+    before_action :load_parent_record
     
     def index
       @title = t('Checkout Items')
@@ -23,7 +23,7 @@ module ItemCheckoutx
     end
   
     def create
-      @checkout = ItemCheckoutx::Checkout.new(params[:checkout], :as => :role_new)
+      @checkout = ItemCheckoutx::Checkout.new(new_params)
       @checkout.last_updated_by_id = session[:user_id]
       @checkout.requested_by_id = session[:user_id]
       @checkout.checkout_by_id = session[:user_id]
@@ -32,7 +32,7 @@ module ItemCheckoutx
         stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
         @item.stock_qty -= params[:checkout][:out_qty].to_i if params[:checkout][:out_qty].present?
         if @checkout.save && @item.save && stock_enough
-          redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
+          redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Saved!")
         else
           @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
           @erb_code = find_config_const('checkout_new_view', 'item_checkoutx')
@@ -48,7 +48,7 @@ module ItemCheckoutx
       @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
       @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
       if !@checkout.skip_wf && @checkout.wf_state.present? && @checkout.current_state != :initial_state
-        redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
+        redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=NO Update. Record Being Processed!")
       end
 
     end
@@ -57,8 +57,8 @@ module ItemCheckoutx
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
       if !(!@checkout.skip_wf && @checkout.wf_state.present? && @checkout.current_state != :initial_state)
         stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
-        if stock_enough && @checkout.update_attributes(params[:checkout], :as => :role_update)
-          redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        if stock_enough && @checkout.update_attributes(edit_params)
+          redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Updated!")
         else
           @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
           @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
@@ -89,6 +89,18 @@ module ItemCheckoutx
       @item = ItemCheckoutx.item_class.find_by_id(ItemCheckoutx::Checkout.find_by_id(params[:id]).item_id) if params[:id].present?
       @project_id = params[:project_id].to_i if params[:project_id].present?
       @whs_string = params[:whs_string].strip if params[:whs_string].present?
+    end
+    
+    private
+    
+    def new_params
+      params.require(:item).permit(:brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state,  
+                    :name, :item_spec, :request_date, :unit, :skip_wf, :whs_string)
+    end
+    
+    def edit_params
+      params.require(:item).permit(:brief_note, :checkout_by_id, :item_id, :last_updated_by_id, :out_date, :out_qty, :requested_by_id, :requested_qty, :wf_state, 
+                    :name, :item_spec, :request_date, :unit, :released, :skip_wf)
     end
   end
 end

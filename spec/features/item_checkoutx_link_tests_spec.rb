@@ -169,7 +169,7 @@ RSpec.describe "LinkTests", type: :request do
       visit item_checkoutx.checkouts_path()
       #save_and_open_page
       expect(page).to have_content('Released')
-      @i.reload.stock_qty.should eq(90)
+      expect(@i.reload.stock_qty).to eq(90)
     end
     
     it "checkout from submit request to final checkout" do
@@ -222,20 +222,20 @@ RSpec.describe "LinkTests", type: :request do
 
     it "list submitted request then reviewing requests, then rejected requests" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id, :wf_state => 'initial_state')
-      visit item_checkoutx.checkouts_path(:wf_state => 'initial_state')
+      visit item_checkoutx.list_items_checkouts_path(:wf_state => 'initial_state')
       expect(page).to have_content('Submit Checkout')
       click_link 'Submit Checkout'
       fill_in 'checkout_wf_comment', :with => 'Submitting checkout'
       click_button 'Save'
 
-      visit item_checkoutx.checkouts_path(:wf_state => 'reviewing')
+      visit item_checkoutx.list_items_checkouts_path(:wf_state => 'reviewing')
       #save_and_open_page
       expect(page).to have_content('Reviewing')
 
       click_link 'Reject'
       fill_in 'checkout_wf_comment', :with => 'Rejecting checkout'
       click_button 'Save'
-      visit item_checkoutx.checkouts_path(:wf_state => 'rejected')
+      visit item_checkoutx.list_items_checkouts_path(:wf_state => 'rejected')
       expect(page).to have_content('Rejected')
     end
 

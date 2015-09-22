@@ -8,7 +8,7 @@
 <%= simple_form_for @checkout do |f| %>    
   <%= f.input :item_id, :label => t("Item#"), :readonly => true, :input_html => {:value => @item.id} %> 
   <%= f.input :name, :label => t("Item Name"), :readonly => true, :input_html => {:value => @item.name} %>
-  <%= f.input :item_spec, :label => t("Spec"), :readonly => true, :input_html => {:value => @item.item_spec} %>
+  <%= f.input :item_spec, :label => t("Spec"), :readonly => true, :input_html => {:value => @item.spec} %>
   <%= f.input :request_date, :label => t("Request Date"), :as => :string %> 
   <%= f.input :requested_qty, :label => t("Requested Qty") %>
   <%= f.input :unit, :label => t("Unit"), :collection => @qty_unit, :include_blank => true %>  
@@ -16,7 +16,7 @@
                 :include_blank => true) %> 
   <%= f.input :brief_note, :label => t("Inspection"), :input_html => {:rows => 3} %> 
   
-  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
+  <%= link_to t('Back'), SUBURI + "/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
   <%= f.button :submit, t('Save'), :class => BUTTONS_CLS['action'] %>  
 <% end %>
 

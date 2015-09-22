@@ -8,11 +8,11 @@ ItemCheckoutx::Engine.routes.draw do
     elsif Rails.env.test?
       member do
         get :event_action
-        put :submit
-        put :approve
-        put :reject
-        put :release
-        put :rewind
+        patch :submit
+        patch :approve
+        patch :reject
+        patch :release
+        patch :rewind
       end
       
       collection do

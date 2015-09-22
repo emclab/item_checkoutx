@@ -129,16 +129,16 @@ module ItemCheckoutx
         session[:user_id] = @u.id
         q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :out_qty => 10, :requested_qty => 10)
         get 'create', { :item_id => @i1.id, :checkout => q}
-        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
-        assigns(:checkout).out_qty.should eq(10)
-        assigns(:item).stock_qty.should eq(90)
+        expect(response).to redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Saved!")
+        expect(assigns(:checkout).out_qty).to eq(10)
+        expect(assigns(:item).stock_qty).to eq(90)
       end
       
       it "should render new with data error" do
         user_access = FactoryGirl.create(:user_access, :action => 'create', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
         session[:user_id] = @u.id
-        q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :requested_qty => nil)
+        q = FactoryGirl.attributes_for(:item_checkoutx_checkout, :item_id => @i1.id, :requested_qty => 0)
         get 'create', { :item_id => @i1.id, :checkout => q}
         expect(response).to render_template('new')
       end
@@ -162,7 +162,7 @@ module ItemCheckoutx
         session[:user_id] = @u.id
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :last_updated_by_id => @u.id)
         get 'update', { :id => q.id, :checkout => {:requested_qty => 20}}
-        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        expect(response).to redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Updated!")
       end
       
       it "should render edit with data error" do

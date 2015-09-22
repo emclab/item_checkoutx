@@ -7,21 +7,6 @@ module ItemCheckoutx
       expect(c).to be_valid
     end
     
-    it "should reject nil name" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, name: nil)
-      expect(c).not_to be_valid
-    end
-    
-    it "should reject nil item_spec" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, item_spec: nil)
-      expect(c).not_to be_valid
-    end
-    
-    it "should reject nil unit" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, unit: nil)
-      expect(c).not_to be_valid
-    end
-    
     it "should reject 0 item_id" do
       c = FactoryGirl.build(:item_checkoutx_checkout, :item_id => 0)
       expect(c).not_to be_valid
@@ -34,6 +19,11 @@ module ItemCheckoutx
     
     it "should reject 0 requested_qty" do
       c = FactoryGirl.build(:item_checkoutx_checkout, :requested_qty => 0)
+      expect(c).not_to be_valid
+    end
+    
+    it "should reject nil requested_qty" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :requested_qty => nil)
       expect(c).not_to be_valid
     end
     
@@ -62,14 +52,14 @@ module ItemCheckoutx
       expect(c).to be_valid
     end
     
-    it "should take 0 unit price" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, :unit_price => 0) 
+    it "should take nil unit " do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :unit => nil) 
       expect(c).to be_valid
     end
     
-    it "should take nil unit price" do
-      c = FactoryGirl.build(:item_checkoutx_checkout, :unit_price => nil) 
-      expect(c).to be_valid
+    it "should reject 0 item_id" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :item_id => 0) 
+      expect(c).not_to be_valid
     end
   end
 end

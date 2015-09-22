@@ -5,7 +5,7 @@ FactoryGirl.define do
     name "MyString"
     in_date "2014-01-13"
     in_qty 1
-    item_spec "MyString"
+    spec "MyString"
     last_updated_by_id 1
     stock_qty 1
     note "MyText"

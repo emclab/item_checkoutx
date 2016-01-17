@@ -12,8 +12,13 @@ module ItemCheckoutx
       expect(c).not_to be_valid
     end
     
-    it "should allow 0 out qty" do
+    it "should not allow 0 out qty" do
       c = FactoryGirl.build(:item_checkoutx_checkout, :out_qty => 0)
+      expect(c).not_to be_valid
+    end
+    
+    it "should allow negative out qty" do
+      c = FactoryGirl.build(:item_checkoutx_checkout, :out_qty => -1)
       expect(c).to be_valid
     end
     

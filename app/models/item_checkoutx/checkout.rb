@@ -37,18 +37,23 @@ module ItemCheckoutx
     
     validates :requested_qty, :presence => true, :numericality => {:only_integer => false, :greater_than => 0}
     validates :item_id, :presence => true, :numericality => {:only_integer => true, :greater_than => 0} #, :if => 'item_id.present?'
-    validates :out_qty, :numericality => {:only_integer => false, :greater_than_or_equal_to => 0}, :if => 'out_qty.present?'
+    validates :out_qty, :numericality => true, :if => 'out_qty.present?' 
     validates :out_qty, :numericality => {:less_than_or_equal_to => :requested_qty, :message => I18n.t('Requested Qty <= Checkout Qty')}, :if => 'out_qty.present? && requested_qty.present?' 
     validate :dynamic_validate 
+    validate :check_out_qty
+    #for workflow input validation  
+    validate :validate_wf_input_data, :if => 'wf_state.present?' 
+    
     
     def dynamic_validate
       wf = Authentify::AuthentifyUtility.find_config_const('dynamic_validate', 'item_checkoutx')
       eval(wf) if wf.present?
     end        
-                                          
-    #for workflow input validation  
-    validate :validate_wf_input_data, :if => 'wf_state.present?' 
     
+    def check_out_qty
+      errors.add(:out_qty, I18n.t('Qty <> 0')) if out_qty == 0      
+    end
+                                          
     def validate_wf_input_data
       wf = Authentify::AuthentifyUtility.find_config_const('validate_checkout_' + self.wf_state, 'item_checkoutx')
       if Authentify::AuthentifyUtility.find_config_const('wf_validate_in_config') == 'true' && wf.present? 

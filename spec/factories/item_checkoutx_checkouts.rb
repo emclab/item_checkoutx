@@ -14,5 +14,6 @@ FactoryGirl.define do
     unit 'piece'
     aux_resource 'aux'
     whs_string 'wh1'
+    fort_token '123456789'
   end
 end

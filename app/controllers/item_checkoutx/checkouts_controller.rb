@@ -12,14 +12,14 @@ module ItemCheckoutx
       @checkouts = @checkouts.where(:item_id => @item.id) if @item
       @checkouts = @checkouts.where(:wf_state => params[:wf_state]) if params[:wf_state]
       @checkouts = @checkouts.page(params[:page]).per_page(@max_pagination)
-      @erb_code = find_config_const('checkout_index_view', 'item_checkoutx')
+      @erb_code = find_config_const('checkout_index_view', session[:fort_token], 'item_checkoutx')
     end
   
     def new
       @title = t('New Checkout Item')
       @checkout = ItemCheckoutx::Checkout.new()
       #@qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
-      @erb_code = find_config_const('checkout_new_view', 'item_checkoutx')
+      @erb_code = find_config_const('checkout_new_view', session[:fort_token], 'item_checkoutx')
     end
   
     def create
@@ -35,7 +35,7 @@ module ItemCheckoutx
         else
           #@qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
           @item = ItemCheckoutx.item_class.find_by_id(params[:checkout][:item_id]) if params[:checkout].present? && params[:checkout][:item_id].present?
-          @erb_code = find_config_const('checkout_new_view', 'item_checkoutx')
+          @erb_code = find_config_const('checkout_new_view', session[:fort_token], 'item_checkoutx')
           flash[:notice] = t('Data Error. Not Saved!')
           render 'new'  
         end
@@ -46,37 +46,28 @@ module ItemCheckoutx
       @title = t('Update Checkout Item')
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
       #@qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
-      @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
-      if !@checkout.skip_wf && @checkout.wf_state.present? && @checkout.current_state != :initial_state
-        redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=NO Update. Record Being Processed!")
-      end
+      @erb_code = find_config_const('checkout_edit_view', session[:fort_token], 'item_checkoutx')
 
     end
   
     def update
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
-      if !(!@checkout.skip_wf && @checkout.wf_state.present? && @checkout.current_state != :initial_state)
-        stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
-        if stock_enough && @checkout.update_attributes(edit_params)
-          redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Updated!")
-        else
-          #@qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
-          @erb_code = find_config_const('checkout_edit_view', 'item_checkoutx')
-          flash[:notice] = t('Data Error. Not Updated!')
-          render 'edit'
-        end
+      
+      stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
+      if stock_enough && @checkout.update_attributes(edit_params)
+        redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Updated!")
+      else
+        #@qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
+        @erb_code = find_config_const('checkout_edit_view', session[:fort_token], 'item_checkoutx')
+        flash[:notice] = t('Data Error. Not Updated!')
+        render 'edit'   
       end
     end
     
     def show
       @title = t('Checkout Item Info')
       @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
-      @erb_code = find_config_const('checkout_show_view', 'item_checkoutx')
-    end
-
-    def list_open_process  
-      index()
-      @checkouts = return_open_process(@checkouts, find_config_const('checkout_wf_final_state_string', 'item_checkoutx'))  # ModelName_wf_final_state_string
+      @erb_code = find_config_const('checkout_show_view', session[:fort_token], 'item_checkoutx')
     end
     
     def list_items
@@ -89,8 +80,8 @@ module ItemCheckoutx
       @item = ItemCheckoutx.item_class.find_by_id(ItemCheckoutx::Checkout.find_by_id(params[:id]).item_id) if params[:id].present?
       @item = ItemCheckoutx.item_class.find_by_id(params[:checkout][:item_id]) if params[:checkout].present? && params[:checkout][:item_id].present?      
       @whs_string = params[:whs_string].strip if params[:whs_string].present?
-      @qty_unit = find_config_const('piece_unit').split(',').map(&:strip) if find_config_const('piece_unit')
-      @qty_unit = Commonx::CommonxHelper.return_misc_definitions('piece_unit') unless find_config_const('piece_unit')
+      @qty_unit = find_config_const('piece_unit', session[:fort_token]).split(',').map(&:strip) if find_config_const('piece_unit', session[:fort_token])
+      @qty_unit = return_misc_definitions('piece_unit') unless find_config_const('piece_unit', session[:fort_token])
     end
     
     private

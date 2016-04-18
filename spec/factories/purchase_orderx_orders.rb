@@ -22,5 +22,6 @@ FactoryGirl.define do
     other_cost "9.99"
     po_num 'po##'
     requested_by_id 1
+    fort_token '123456789'
   end
 end

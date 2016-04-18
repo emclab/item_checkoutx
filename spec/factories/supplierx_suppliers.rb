@@ -20,6 +20,6 @@ FactoryGirl.define do
     quality_system_id 1
     note 'some note here'
     short_comment "good"
-    
+    fort_token '123456789'
   end
 end

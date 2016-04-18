@@ -26,25 +26,6 @@ RSpec.describe "LinkTests", type: :request do
                'form-span#'         => '4'
         }
     before(:each) do
-      wf = "def submit
-          wf_common_action('initial_state', 'reviewing', 'submit')
-        end   
-        def approve
-          wf_common_action('reviewing', 'approved', 'approve')
-        end
-        def reject
-          wf_common_action('reviewing', 'rejected', 'reject')
-        end
-        def rewind
-          wf_common_action('rejected', 'initial_state', 'rewind')
-        end
-        def release
-          wf_common_action('approved', 'released', 'release')
-          @item.stock_qty -= params[:checkout][:out_qty].to_i if params[:checkout][:out_qty].to_i > 0
-          @item.save if params[:checkout][:out_qty].to_i > 0
-        end"
-
-      FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_action_def', :argument_value => wf)
       final_state = 'rejected, released'
       FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_final_state_string', :argument_value => final_state)
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
@@ -70,6 +51,7 @@ RSpec.describe "LinkTests", type: :request do
       ul = FactoryGirl.build(:user_level, :sys_user_group_id => ug.id)
       @u = FactoryGirl.create(:user, :user_levels => [ul], :user_roles => [ur])
       
+      config_entry = FactoryGirl.create(:engine_config, :engine_name => 'rails_app', :engine_version => nil, :argument_name => 'SESSION_TIMEOUT_MINUTES', :argument_value => 30)
       ua1 = FactoryGirl.create(:user_access, :action => 'index', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
       :sql_code => "ItemCheckoutx::Checkout.order('created_at DESC')")
       ua1 = FactoryGirl.create(:user_access, :action => 'create', :resource => 'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
@@ -128,9 +110,9 @@ RSpec.describe "LinkTests", type: :request do
       #save_and_open_page
 
       # submit for manager review
-      visit item_checkoutx.checkouts_path
+      #visit item_checkoutx.checkouts_path
       #save_and_open_page
-      click_link 'Submit Checkout'
+      #click_link 'Submit Checkout'
       #save_and_open_page
 
       #bad data
@@ -156,7 +138,7 @@ RSpec.describe "LinkTests", type: :request do
       click_button 'Save'
       #save_and_open_page
     end
-
+=begin
     it "should checkout an approved item" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :requested_qty => 10, :item_id => @i.id, :wf_state => 'approved')
       visit item_checkoutx.checkouts_path(:item_id => @i.id)  #allow to redirect after save new below
@@ -238,6 +220,6 @@ RSpec.describe "LinkTests", type: :request do
       visit item_checkoutx.list_items_checkouts_path(:wf_state => 'rejected')
       expect(page).to have_content('Rejected')
     end
-
+=end
   end
 end

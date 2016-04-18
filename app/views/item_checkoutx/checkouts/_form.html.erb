@@ -1,4 +1,4 @@
-<% if @view_in_config && @erb_code %>
+<% if @erb_code %>
   <%= render inline: @erb_code %>
   
 <% else %>
@@ -11,7 +11,7 @@
   <%= f.input :request_date, :label => t("Request Date"), :as => :string %> 
   <%= f.input :requested_qty, :label => t("Requested Qty"), :readonly => readonly?(@checkout, 'requested_qty') %>
   <%= f.input :unit, :label => t("Unit"), :collection => @qty_unit, :include_blank => true %>  
-  <%= f.input :requested_by_id, :label => t("Requested By"), :collection => Authentify::UsersHelper::return_users('production', 'item_checkoutx_checkouts'), :label_method => :name, :value_method => :id %> 
+  <%= f.input :requested_by_id, :label => t("Requested By"), :collection => return_users('production', 'item_checkoutx_checkouts'), :label_method => :name, :value_method => :id %> 
   <%= f.input :brief_note, :label => t("Brief Note"), :input_html => {:rows => 3}, :readonly => readonly?(@checkout, 'brief_note') %>
   <%= f.input :last_updated_by_name, :readonly => true, :input_html => {:value => @checkout.last_updated_by.name} if @checkout.last_updated_by_id.present? %> 
   

@@ -18,5 +18,6 @@ FactoryGirl.define do
     other_cost "9.99"
     whs_string 'headquarter'
     total_cost 8.99
+    fort_token '123456789'
   end
 end

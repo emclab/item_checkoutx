@@ -27,7 +27,7 @@ class CreatePettyWarehousexItems < ActiveRecord::Migration
       t.integer :purchase_order_id
       t.string :part_num
       t.string :aux_resource
-      
+      t.string :fort_token
     end
     
     add_index :petty_warehousex_items, :name

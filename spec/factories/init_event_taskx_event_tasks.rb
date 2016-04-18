@@ -16,5 +16,6 @@ FactoryGirl.define do
     requested_by_id 1
     executioner_id 1
     task_status_id 1
+    fort_token '123456789'
   end
 end

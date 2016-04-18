@@ -47,6 +47,7 @@ module ItemCheckoutx
       @i1 = FactoryGirl.create(:petty_warehousex_item, :name => 'a new name', :in_qty => 100, :stock_qty => 100)
       
       session[:user_role_ids] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id).user_role_ids
+      session[:fort_token] = @u.fort_token
     end
     
     render_views

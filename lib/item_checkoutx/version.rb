@@ -1,3 +1,3 @@
 module ItemCheckoutx
-  VERSION = "03"
+  VERSION = "01"
 end

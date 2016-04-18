@@ -27,6 +27,7 @@ class CreateHeavyMachineryProjectxProjects < ActiveRecord::Migration
       t.integer :category_id
       t.text :construction_requirement
       t.string :project_num
+      t.string :fort_token
       
     end
     

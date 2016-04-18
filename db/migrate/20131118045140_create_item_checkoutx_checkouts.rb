@@ -17,6 +17,7 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
       t.timestamps
       t.string :whs_string   #warehouse name. used to allow access to each individual whs.
       t.string :aux_resource
+      t.string :fort_token
       
     end
     
@@ -25,5 +26,6 @@ class CreateItemCheckoutxCheckouts < ActiveRecord::Migration
     add_index :item_checkoutx_checkouts, :skip_wf
     add_index :item_checkoutx_checkouts, :whs_string
     add_index :item_checkoutx_checkouts, :aux_resource
+    add_index :item_checkoutx_checkouts, :fort_token
   end
 end

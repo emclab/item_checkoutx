@@ -7,11 +7,11 @@ require "item_checkoutx/version"
 Gem::Specification.new do |s|
   s.name        = "item_checkoutx"
   s.version     = ItemCheckoutx::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of ItemCheckoutx."
-  s.description = "TODO: Description of ItemCheckoutx."
+  s.authors     = ["Your name"]
+  s.email       = ["Your@email.com"]
+  s.homepage    = "http://home.com"
+  s.summary     = "Summary of ItemCheckoutx."
+  s.description = "Description of ItemCheckoutx."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]

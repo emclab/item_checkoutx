@@ -35,7 +35,7 @@ module ItemCheckoutx
     belongs_to :checkout_by, :class_name => 'Authentify::User'
     belongs_to :item, :class_name => ItemCheckoutx.item_class.to_s
     
-    validates :requested_qty, :presence => true, :numericality => {:only_integer => false, :greater_than => 0}
+    validates :requested_qty, :presence => true, :numericality => {:greater_than => 0}
     validates :item_id, :presence => true, :numericality => {:only_integer => true, :greater_than => 0} #, :if => 'item_id.present?'
     validates :out_qty, :numericality => true, :if => 'out_qty.present?' 
     validates :out_qty, :numericality => {:less_than_or_equal_to => :requested_qty, :message => I18n.t('Requested Qty <= Checkout Qty')}, :if => 'out_qty.present? && requested_qty.present?' 

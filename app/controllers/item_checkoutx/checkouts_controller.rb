@@ -27,6 +27,7 @@ module ItemCheckoutx
       @checkout.last_updated_by_id = session[:user_id]
       @checkout.requested_by_id = session[:user_id]
       @checkout.checkout_by_id = session[:user_id]
+      @checkout.fort_token = session[:fort_token]
       @checkout.transaction do  #need to deduct the qty of checkout from the item.stock_qty
         stock_enough = (@item.stock_qty >= params[:checkout][:requested_qty].to_i)
         @item.stock_qty -= params[:checkout][:out_qty].to_i if params[:checkout][:out_qty].present?

@@ -95,12 +95,15 @@ RSpec.describe "LinkTests", type: :request do
       visit '/'
       #save_and_open_page
       fill_in "login", :with => @u.login
-      fill_in "password", :with => 'password'
+      fill_in "password", :with => @u.password
       click_button 'Login'
     end
     it "works! (now write some real specs)" do
       q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i.id)
       visit item_checkoutx.checkouts_path
+      expect(Authentify::SysLog.all.count).to eq(1)
+      expect(Authentify::SysLog.all.first.resource).to eq('item_checkoutx/checkouts')
+      expect(Authentify::SysLog.all.first.user_id).to eq(@u.id)
       #save_and_open_page
       expect(page).to have_content('Checkout Items')
       click_link 'Edit'

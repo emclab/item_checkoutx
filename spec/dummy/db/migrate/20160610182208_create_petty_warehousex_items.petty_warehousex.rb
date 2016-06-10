@@ -28,6 +28,8 @@ class CreatePettyWarehousexItems < ActiveRecord::Migration
       t.string :part_num
       t.string :aux_resource
       t.string :fort_token
+      t.integer :whs_id
+      
     end
     
     add_index :petty_warehousex_items, :name
@@ -40,5 +42,7 @@ class CreatePettyWarehousexItems < ActiveRecord::Migration
     add_index :petty_warehousex_items, :accepted
     add_index :petty_warehousex_items, :part_num
     add_index :petty_warehousex_items, :aux_resource
+    add_index :petty_warehousex_items, :fort_token
+    add_index :petty_warehousex_items, :whs_id
   end
 end

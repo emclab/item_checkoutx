@@ -25,6 +25,7 @@ module ItemCheckoutx
         def checkout
           wf_common_action('approved', 'checkedout', 'checkout')
         end"
+      FactoryGirl.create(:engine_config, :engine_name => 'rails_app', :engine_version => nil, :argument_name => 'enable_info_logger', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_action_def', :argument_value => wf)
       final_state = 'rejected, checkedout'
       FactoryGirl.create(:engine_config, :engine_name => 'item_checkoutx', :engine_version => nil, :argument_name => 'checkout_wf_final_state_string', :argument_value => final_state)
@@ -193,6 +194,17 @@ module ItemCheckoutx
         q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :checkout_by_id => @u.id, :last_updated_by_id => @u.id)
         get 'show', { :id => q.id }
         expect(response).to be_success
+      end
+    end
+    
+    describe "GET 'destroy'" do
+      it "returns http success" do
+        user_access = FactoryGirl.create(:user_access, :action => 'destroy', :resource =>'item_checkoutx_checkouts', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "")
+        session[:user_id] = @u.id
+        q = FactoryGirl.create(:item_checkoutx_checkout, :item_id => @i1.id, :checkout_by_id => @u.id, :last_updated_by_id => @u.id)
+        get 'destroy', { :id => q.id }
+        expect(response).to redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Deleted!")
       end
     end
 

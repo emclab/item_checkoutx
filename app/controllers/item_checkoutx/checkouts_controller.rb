@@ -72,6 +72,12 @@ module ItemCheckoutx
       @erb_code = find_config_const('checkout_show_view', session[:fort_token], 'item_checkoutx')
     end
     
+    def destroy
+      @checkout = ItemCheckoutx::Checkout.find_by_id(params[:id])
+      ItemCheckoutx::Checkout.delete(params[:id].to_i)
+      redirect_to URI.escape(SUBURI + "/view_handler?index=0&msg=Successfully Deleted!")
+    end
+    
     def list_items
       index
     end

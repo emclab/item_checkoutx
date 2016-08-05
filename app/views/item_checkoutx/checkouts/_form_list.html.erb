@@ -4,6 +4,8 @@
 <% else %>
 <div class="pagination"><%= will_paginate models %></div>
 <h4><%= @title %></h4>
+<p> <%= label_tag(:whs_name, t("Warehouse")) %>
+	<%= select_tag(:whs_id, options_for_select(return_misc_definitions('warehouse').map{|r| [r.name, r.id]}), include_blank: true) %></p>
     <table class="table table-striped">
 		<tr>
 			<th>#</th>
@@ -28,8 +30,8 @@
 		  	  <td><%= r.id %></td>
 		  	<% end %>
 		  	<td><%= r.request_date.strftime("%Y/%m/%d") %></td>
-		  	<% if has_action_right?('show', ItemCheckoutx.item_class.to_s.underscore.pluralize, ItemCheckoutx.item_class.find_by_id(r.item_id))%>
-		  	  <td><%= link_to r.name, SUBURI + "/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(ItemCheckoutx.show_item_path))}" %></td>
+		  	<% if has_action_right?('show', ItemCheckoutx.item_class.to_s.underscore.pluralize, r.item) %>
+		  	  <td><%= link_to r.item.name, SUBURI + "/view_handler?index=1&url=#{SUBURI + petty_warehousex.item_path(r.item)}" %></td>
 		  	<% else %>
 		  	  <td><%= r.item.name %></td>
 		  	<% end %>

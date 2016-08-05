@@ -29,6 +29,7 @@ class CreatePettyWarehousexItems < ActiveRecord::Migration
       t.string :aux_resource
       t.string :fort_token
       t.integer :whs_id
+      t.integer :i_unit_id  #unit defined in commonx
       
     end
     

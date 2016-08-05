@@ -1,0 +1,10 @@
+<% if  @js_erb_code %>
+  <%= render inline: ERB.new(@js_erb_code).result(binding) %>
+  
+<% else %>
+<% if params[:field_changed] == 'whs_id'  %>
+  <% @checkouts = @checkouts.joins(:item).where('petty_warehousex_items.whs_id = ?', params[:whs_id].to_i) if params[:whs_id].present? %>
+  $('#index_page').html("<%= escape_javascript render partial: 'form_list', locals: {models: @checkouts, whs_id: params[:whs_id]} %>");
+<% end %>
+
+<% end %>

@@ -2,7 +2,7 @@ module ItemCheckoutx
   class Checkout < ActiveRecord::Base
 
     attr_accessor :last_updated_by_name, :id_noupdate, :wf_comment, :wf_state_noupdate, :wf_event, :requested_by_name, :checkout_by_name, :skip_wf_noupdate,
-                  :name, :item_spec
+                  :name, :item_spec, :whs_name
 
     belongs_to :last_updated_by, :class_name => 'Authentify::User'
     belongs_to :requested_by, :class_name => 'Authentify::User'

@@ -14,6 +14,7 @@ module ItemCheckoutx
       @checkouts = @checkouts.where(:wf_state => params[:wf_state]) if params[:wf_state]
       @checkouts = @checkouts.page(params[:page]).per_page(@max_pagination)
       @erb_code = find_config_const('checkout_index_view', session[:fort_token], 'item_checkoutx')
+      @js_erb_code = find_config_const('checkout_index_js_view', session[:fort_token], 'item_checkoutx')
     end
   
     def new

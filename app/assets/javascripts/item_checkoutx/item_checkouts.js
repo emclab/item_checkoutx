@@ -6,3 +6,11 @@ $(function() {
 	$( "#checkout_start_date_s" ).datepicker({dateFormat: 'yy-mm-dd'});
 	$( "#checkout_end_date_s" ).datepicker({dateFormat: 'yy-mm-dd'});
 });
+
+$(function() {
+  $(document).on('change', '#whs_id', function (){  //only document/'body' works with every change. ('#whs_id') only works once.
+     // alert("fire");
+  	$.get(window.location, {whs_id: $('#whs_id').val(), field_changed: 'whs_id'}, null, "script");
+    return false;
+  });
+});

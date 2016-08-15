@@ -3,8 +3,8 @@
 $(function() {
 	$( "#checkout_out_date" ).datepicker({dateFormat: 'yy-mm-dd'});
 	$( "#checkout_request_date" ).datepicker({dateFormat: 'yy-mm-dd'});
-	$( "#checkout_start_date_s" ).datepicker({dateFormat: 'yy-mm-dd'});
-	$( "#checkout_end_date_s" ).datepicker({dateFormat: 'yy-mm-dd'});
+	$( "#start_date_s" ).datepicker({dateFormat: 'yy-mm-dd'});
+	$( "#end_date_s" ).datepicker({dateFormat: 'yy-mm-dd'});
 });
 
 $(function() {
